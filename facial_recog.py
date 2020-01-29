@@ -1,14 +1,25 @@
+'''
+Samaritan Security Facial Recognition Script
+
+SDMay20-45
+Dept. of Electrical and Computer Engineering
+Iowa State University 
+Author(s): Devin Uner, Ryan Goluch 
+'''
+
 import face_recognition
 import cv2
 import numpy as np
 
-video_capture = cv2.VideoCapture(0)
+#Use a list of camera ips for ease of testing
+file = open(r"camera_ip.txt", "r")
+ip = file.readline()
+video_capture = cv2.VideoCapture("http://"+str(ip)+"/video.mjpg")
 
-devin_image = face_recognition.load_image_file("Devin_Uner.png")
-devin_face_encoding = face_recognition.face_encodings(devin_image)[0]
-
-known_face_encodings = [devin_face_encoding]
-known_face_names = ["Devin_Uner"]
+user_image = face_recognition.load_image_file("Goluch_Ryan.jpeg")
+user_face_encoding = face_recognition.face_encodings(user_image)[0]
+known_face_encodings = [user_face_encoding]
+known_face_names = ["Ryan Goluch"]
 
 
 
@@ -17,7 +28,8 @@ while True:
     ret, frame = video_capture.read()
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
-    # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+    # Convert the image from BGR color (which OpenCV uses) 
+    # to RGB color (which face_recognition uses)
     rgb_small_frame = small_frame[:, :, ::-1]
 
     # Find all the faces and face encodings in the current frame of video
@@ -38,15 +50,15 @@ while True:
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
 
         matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-        name = "Unknown"
+        image_name = "Unknown"
 
         # If a match was found in known_face_encodings, just use the first one.
         if True in matches:
             first_match_index = matches.index(True)
-            name = known_face_names[first_match_index]
+            image_name = known_face_names[first_match_index]
             
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, image_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     # Display the resulting image
     cv2.imshow('Video', frame)
