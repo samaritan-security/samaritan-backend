@@ -4,24 +4,40 @@ Samaritan Security Facial Recognition Script
 SDMay20-45
 Dept. of Electrical and Computer Engineering
 Iowa State University 
-Author(s): Devin Uner, Ryan Goluch 
+Author(s): Devin Uner, Ryan Goluch, Ann Gould
 '''
 
 import face_recognition
 import cv2
-import numpy as np
-
-#Use a list of camera ips for ease of testing
-file = open(r"camera_ip.txt", "r")
-ip = file.readline()
-video_capture = cv2.VideoCapture("http://"+str(ip)+"/video.mjpg")
-
-user_image = face_recognition.load_image_file("Goluch_Ryan.jpeg")
-user_face_encoding = face_recognition.face_encodings(user_image)[0]
-known_face_encodings = [user_face_encoding]
-known_face_names = ["Ryan Goluch"]
+# import numpy as np
 
 
+'''
+gets ips from file 
+'''
+def get_camera_ip_from_file(filename: str):
+    #Use a list of camera ips for ease of testing
+    file = open(filename, "r")
+    ip = file.readline()
+    video_capture = cv2.VideoCapture("http://"+str(ip)+"/video.mjpg")
+    file.close() #RYANN!! close your files!!
+    return video_capture
+
+
+# can return multiple different things in python (peep return statement)
+'''
+loads facial recog image file, encodes and names known face
+'''
+def facial_recog_process(image_name: str):
+    user_image = face_recognition.load_image_file(image_name)
+    user_face_encoding = face_recognition.face_encodings(user_image)[0]
+    encodings_list = [user_face_encoding]
+    names = ["Ryan Goluch"]
+    return encodings_list, names
+
+
+video_capture = get_camera_ip_from_file("camera_ip.txt")
+known_face_encodings, known_face_names = facial_recog_process("Goluch_Ryan.jpeg")
 
 while True:
     # Grab a single frame of video
