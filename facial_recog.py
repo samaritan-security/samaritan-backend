@@ -15,19 +15,23 @@ import cv2
 '''
 gets ips from file 
 '''
+
+
 def get_camera_ip_from_file(filename: str):
-    #Use a list of camera ips for ease of testing
+    # Use a list of camera ips for ease of testing
     file = open(filename, "r")
     ip = file.readline()
-    video_capture = cv2.VideoCapture("http://"+str(ip)+"/video.mjpg")
-    file.close() #RYANN!! close your files!!
-    return video_capture
+    video_feed = cv2.VideoCapture("http://" + str(ip) + "/video.mjpg")
+    file.close()  # RYANN!! close your files!!
+    return video_feed
 
 
 # can return multiple different things in python (peep return statement)
 '''
 loads facial recog image file, encodes and names known face
 '''
+
+
 def facial_recog_process(image_name: str):
     user_image = face_recognition.load_image_file(image_name)
     user_face_encoding = face_recognition.face_encodings(user_image)[0]
@@ -35,6 +39,11 @@ def facial_recog_process(image_name: str):
     names = ["Ryan Goluch"]
     return encodings_list, names
 
+
+# writes the facial data to DB
+def add_facial_data():
+    # TODO
+    return True
 
 video_capture = get_camera_ip_from_file("camera_ip.txt")
 known_face_encodings, known_face_names = facial_recog_process("Goluch_Ryan.jpeg")
@@ -72,7 +81,7 @@ while True:
         if True in matches:
             first_match_index = matches.index(True)
             image_name = known_face_names[first_match_index]
-            
+
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, image_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
