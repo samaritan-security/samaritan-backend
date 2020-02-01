@@ -14,8 +14,7 @@ from random import random
 import time
 import os
 import json
-# import numpy as np
-
+import datetime
 
 '''
 gets ips from file 
@@ -51,9 +50,12 @@ def add_facial_data():
     # TODO
     return True
 
+
 def generate_json(name: str) -> json:
-    print("foo")
-    pass
+    data = {"name": name, "date": datetime.datetime.now()}
+    print(data)
+    return json.dumps(data)
+
 
 video_capture = get_camera_ip_from_file("camera_ip.txt")
 known_face_encodings, known_face_names = facial_recog_process("images/Goluch_Ryan.jpeg")
