@@ -13,6 +13,7 @@ from random import seed
 from random import random
 import time
 import os
+import json
 # import numpy as np
 
 
@@ -27,7 +28,7 @@ def get_camera_ip_from_file(filename: str):
     ip = file.readline()
     # video_feed = cv2.VideoCapture(0)
     video_feed = cv2.VideoCapture("http://" + str(ip) + "/video.mjpg")
-    file.close()  # RYANN!! close your files!!
+    file.close()
     return video_feed
 
 
@@ -49,6 +50,10 @@ def facial_recog_process(image_name: str):
 def add_facial_data():
     # TODO
     return True
+
+def generate_json(name: str) -> json:
+    print("foo")
+    pass
 
 video_capture = get_camera_ip_from_file("camera_ip.txt")
 known_face_encodings, known_face_names = facial_recog_process("images/Goluch_Ryan.jpeg")
@@ -94,6 +99,7 @@ while True:
         if True in matches:
             first_match_index = matches.index(True)
             image_name = known_face_names[first_match_index]
+            generate_json(image_name)
         elif False in matches:
             cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
             # video_capture.release()
