@@ -17,6 +17,9 @@ import socket
 import sys
 import numpy as np
 import struct
+import json
+import datetime
+
 
 '''
 gets ips from file 
@@ -29,7 +32,7 @@ def get_camera_ip_from_file(filename: str):
     ip = file.readline()
     # video_feed = cv2.VideoCapture(0)
     video_feed = cv2.VideoCapture("http://" + str(ip) + "/video.mjpg")
-    file.close()  # RYANN!! close your files!!
+    file.close()
     return video_feed
 
 
@@ -51,6 +54,12 @@ def facial_recog_process(image_name: str):
 def add_facial_data():
     # TODO
     return True
+
+
+def generate_json(name: str) -> json:
+    data = {"name": name, "date": datetime.datetime.now()}
+    print(data)
+    return json.dumps(data)
 
 
 video_capture = get_camera_ip_from_file("camera_ip.txt")
@@ -145,6 +154,7 @@ while True:
         if True in matches:
             first_match_index = matches.index(True)
             image_name = known_face_names[first_match_index]
+            generate_json(image_name)
         elif False in matches:
             add_unknown_image()
 
