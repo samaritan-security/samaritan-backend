@@ -52,7 +52,7 @@ def add_facial_data():
 
 
 def generate_json(name: str) -> json:
-    data = {"name": name, "date": datetime.datetime.now()}
+    data = {"name": name, "date": str(datetime.datetime.now())}
     print(data)
     return json.dumps(data)
 
@@ -104,6 +104,7 @@ while True:
             generate_json(image_name)
         elif False in matches:
             cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
+            generate_json(image_name)
             # video_capture.release()
             # cv2.destroyAllWindows()
 
