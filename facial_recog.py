@@ -46,7 +46,7 @@ def add_facial_data():
     return True
 
 video_capture = get_camera_ip_from_file("camera_ip.txt")
-known_face_encodings, known_face_names = facial_recog_process("Goluch_Ryan.jpeg")
+known_face_encodings, known_face_names = facial_recog_process("images/Goluch_Ryan.jpeg")
 
 while True:
     # Grab a single frame of video
