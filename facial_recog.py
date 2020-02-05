@@ -41,17 +41,22 @@ loads facial recog image file, encodes and names known face
 '''
 
 
-def facial_recog_process(image_name: str):
-    dir = os.fsencode("images/")
-    for file in dir:
-        fileName = os.fsdecode(file)
-
-    user_image = face_recognition.load_image_file(image_name)
-    user_face_encoding = face_recognition.face_encodings(user_image)[0]
-    encodings_list = [user_face_encoding]
+def facial_recog_process(face):
+    directory = os.fsencode("images/")
+    for file in os.listdir(directory):
+        file_name = os.fsdecode(file)
+        if not file_name.endswith(".jpeg"):
+            continue
+        user_image = face_recognition.load_image_file("images/"+str(file_name))
+        user_face_encoding = face_recognition.face_encodings(user_image)
+        if len(user_face_encoding) == 0:
+            continue
+        encodings_list = face_recognition.compare_faces([user_face_encoding][0], face)
+        print(encodings_list)
+        if True in encodings_list:
+            break
     names = ["Ryan Goluch"]
     return encodings_list, names
-
 
 # writes the facial data to DB
 def add_facial_data():
@@ -68,7 +73,7 @@ def generate_json(name: str) -> json:
 
 
 video_capture = get_camera_ip_from_file("camera_ip.txt")
-known_face_encodings, known_face_names = facial_recog_process("images/Goluch_Ryan.jpeg")
+# known_face_encodings, known_face_names = facial_recog_process("images/Goluch_Ryan.jpeg")
 
 
 def add_unknown_image():
@@ -78,7 +83,7 @@ def add_unknown_image():
     for file in os.listdir(directory):
         filename = os.fsdecode(file)
         if filename.find(str(image_counter)):
-            image_counter = random()
+            image_counter = random.randrange(int(time.time()))
     cv2.imwrite('images/unknown/%d.jpeg' % image_counter, small_frame)
 
 
@@ -129,7 +134,7 @@ while True:
     # video_client()
     # Grab a single frame of video
     ret, frame = video_capture.read()
-    small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
+    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
     # Convert the image from BGR color (which OpenCV uses) 
     # to RGB color (which face_recognition uses)
@@ -152,7 +157,7 @@ while True:
         # Draw a label with a name below the face
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
 
-        matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+        matches, known_face_names = facial_recog_process(face_encoding) # face_recognition.compare_faces(known_face_encodings, face_encoding)
         image_name = "Unknown"
 
         # If a match was found in known_face_encodings, just use the first one.
@@ -171,7 +176,7 @@ while True:
         cv2.putText(frame, image_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     # Display the resulting image
-    cv2.imshow('Video', frame)
+    # cv2.imshow('Video', frame)
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
