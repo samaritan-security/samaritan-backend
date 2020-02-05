@@ -6,15 +6,19 @@ Dept. of Electrical and Computer Engineering
 Iowa State University 
 Author(s): Devin Uner, Ryan Goluch, Ann Gould
 '''
-
+import pickle
 import face_recognition
 import cv2
 from random import seed
-from random import random
+import random
 import time
 import os
-# import numpy as np
-
+import socket
+import sys
+import numpy as np
+import struct
+import json
+import datetime
 
 '''
 gets ips from file 
@@ -38,6 +42,10 @@ loads facial recog image file, encodes and names known face
 
 
 def facial_recog_process(image_name: str):
+    dir = os.fsencode("images/")
+    for file in dir:
+        fileName = os.fsdecode(file)
+
     user_image = face_recognition.load_image_file(image_name)
     user_face_encoding = face_recognition.face_encodings(user_image)[0]
     encodings_list = [user_face_encoding]
@@ -50,21 +58,78 @@ def add_facial_data():
     # TODO
     return True
 
+
+# TODO add in temp access pics (idk if this needs a function)
+
+def generate_json(name: str) -> json:
+    data = {"name": name, "date": str(datetime.datetime.now())}
+    print(data)
+    return json.dumps(data)
+
+
 video_capture = get_camera_ip_from_file("camera_ip.txt")
 known_face_encodings, known_face_names = facial_recog_process("images/Goluch_Ryan.jpeg")
 
-seed(time.time())
-image_counter = random()
-directory = os.fsencode("images")
-for file in os.listdir(directory):
-    filename = os.fsdecode(file)
-    if filename.find(str(image_counter)):
-        image_counter = random()
+
+def add_unknown_image():
+    seed(time.time())
+    image_counter = random.randrange(int(time.time()))
+    directory = os.fsencode("images/unknown")
+    for file in os.listdir(directory):
+        filename = os.fsdecode(file)
+        if filename.find(str(image_counter)):
+            image_counter = random()
+    cv2.imwrite('images/unknown/%d.jpeg' % image_counter, small_frame)
+
+
+def video_server():
+    host = ''
+    port = 8089
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print('Socket created')
+
+    s.bind((host, port))
+    print('Socket bind complete')
+    s.listen(10)
+    print('Socket now listening')
+    conn, addr = s.accept()
+    ### new
+    data = ""
+    payload_size = struct.calcsize("H")
+    while True:
+        while len(data) < payload_size:
+            data += conn.recv(4096)
+        packed_msg_size = data[:payload_size]
+        data = data[payload_size:]
+        msg_size = struct.unpack("H", packed_msg_size)[0]
+        while len(data) < msg_size:
+            data += conn.recv(4096)
+        frame_data = data[:msg_size]
+        data = data[msg_size:]
+        ###
+
+        frame = pickle.loads(frame_data)
+        print(frame)
+        cv2.imshow('frame', frame)
+
+
+def video_client():
+    cap = cv2.VideoCapture(0)
+    clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    clientsocket.connect(('localhost', 8089))
+    while True:
+        ret, frame = cap.read()
+        data = pickle.dumps(frame)  ### new code
+        clientsocket.sendall(struct.pack("H", len(data)) + data)  ### new code
+
 
 while True:
+    # video_server()
+    # video_client()
     # Grab a single frame of video
     ret, frame = video_capture.read()
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
 
     # Convert the image from BGR color (which OpenCV uses) 
     # to RGB color (which face_recognition uses)
@@ -94,8 +159,11 @@ while True:
         if True in matches:
             first_match_index = matches.index(True)
             image_name = known_face_names[first_match_index]
+            generate_json(image_name)
         elif False in matches:
-            cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
+            add_unknown_image()
+            # cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
+            generate_json(image_name)
             # video_capture.release()
             # cv2.destroyAllWindows()
 
