@@ -7,6 +7,8 @@ Iowa State University
 Author(s): Devin Uner, Ryan Goluch, Ann Gould
 '''
 import pickle
+import re
+
 import face_recognition
 import cv2
 from random import seed
@@ -129,6 +131,49 @@ def video_client():
         clientsocket.sendall(struct.pack("H", len(data)) + data)  ### new code
 
 
+def scan_for_known_people(known_people_folder):
+    names = []
+    face_encodings = []
+
+    for file in image_files_in_folder(known_people_folder):
+        filename = os.path.splitext(os.path.basename(file))[0]
+        print("DEBUG: Attempted to load image file from", file)
+        image = face_recognition.load_image_file(file)
+
+        if os.path.isfile(os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"):
+            #read from file, for performance reasons. useful for large batches of files
+            encodedfile = np.load((os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"))
+
+            if encodedfile is not None:
+                names.append(filename)
+                print("DEBUG: appended from document", filename)
+                face_encodings.append(encodedfile)
+                print("DEBUG: appended from document", encodedfile)
+        else:
+            single_encoding = face_recognition.face_encodings(image)
+
+            if len(single_encoding) > 1:
+                print("WARNING: More than one face found in", file + ".", "Only using the first face.")
+
+            if len(single_encoding) == 0:
+                print("WARNING: No faces found in", file + ".", "Ignoring file.")
+            else:
+                names.append(filename)
+                face_encodings.append(single_encoding[0])
+
+                #write to file, for performance reasons, so as to not calculate all the faces each time
+                encodedfile = np.save((os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"), single_encoding[0])
+                print("DEBUG: saved to document", filename)
+                print("DEBUG: saved to document", encodedfile)
+
+    return names, face_encodings
+
+
+def image_files_in_folder(folder):
+    #following code snippet from face_recognition
+    return [os.path.join(folder, f) for f in os.listdir(folder) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
+
+
 while True:
     # video_server()
     # video_client()
@@ -144,36 +189,57 @@ while True:
     face_locations = face_recognition.face_locations(rgb_small_frame)
     face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-    for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
-        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-        top *= 4
-        right *= 4
-        bottom *= 4
-        left *= 4
+    cv2.imwrite('images/known/temp.jpeg', small_frame)
+    temp = face_recognition.load_image_file("images/known/temp.jpeg")
+    temp_encode = face_recognition.face_encodings(temp)
+    matches, known_face_names = facial_recog_process(temp_encode[0]) # face_recognition.compare_faces(known_face_encodings, face_encoding)
+    image_name = "Unknown"
 
-        # Draw a box around the face
-        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+    if True in matches:
+        first_match_index = matches.index(True)
+        image_name = known_face_names[first_match_index]
+        generate_json(image_name)
+    elif False in matches:
+        add_unknown_image()
+        # cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
+        generate_json(image_name)
+        # video_capture.release()
+        # cv2.destroyAllWindows()
 
-        # Draw a label with a name below the face
-        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
 
-        matches, known_face_names = facial_recog_process(face_encoding) # face_recognition.compare_faces(known_face_encodings, face_encoding)
-        image_name = "Unknown"
 
-        # If a match was found in known_face_encodings, just use the first one.
-        if True in matches:
-            first_match_index = matches.index(True)
-            image_name = known_face_names[first_match_index]
-            generate_json(image_name)
-        elif False in matches:
-            add_unknown_image()
-            # cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
-            generate_json(image_name)
-            # video_capture.release()
-            # cv2.destroyAllWindows()
-
-        font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, image_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+    # for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+    #     # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+    #     top *= 4
+    #     right *= 4
+    #     bottom *= 4
+    #     left *= 4
+    #
+    #     # Draw a box around the face
+    #     cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+    #
+    #     # Draw a label with a name below the face
+    #     cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+    #     cv2.imwrite('images/temp.jpeg', small_frame)
+    #     temp = face_recognition.load_image_file("images/temp.jpeg")
+    #     temp_encode = face_recognition.face_encodings(temp)
+    #     matches, known_face_names = facial_recog_process(temp_encode[0]) # face_recognition.compare_faces(known_face_encodings, face_encoding)
+    #     image_name = "Unknown"
+    #
+    #     # If a match was found in known_face_encodings, just use the first one.
+    #     if True in matches:
+    #         first_match_index = matches.index(True)
+    #         image_name = known_face_names[first_match_index]
+    #         generate_json(image_name)
+    #     elif False in matches:
+    #         add_unknown_image()
+    #         # cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
+    #         generate_json(image_name)
+    #         # video_capture.release()
+    #         # cv2.destroyAllWindows()
+    #
+    #     font = cv2.FONT_HERSHEY_DUPLEX
+    #     cv2.putText(frame, image_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     # Display the resulting image
     # cv2.imshow('Video', frame)
