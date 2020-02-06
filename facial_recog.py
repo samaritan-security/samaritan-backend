@@ -8,7 +8,6 @@ Author(s): Devin Uner, Ryan Goluch, Ann Gould
 '''
 import pickle
 import re
-
 import face_recognition
 import cv2
 from random import seed
@@ -43,22 +42,26 @@ loads facial recog image file, encodes and names known face
 '''
 
 
-def facial_recog_process(face):
-    directory = os.fsencode("images/")
-    for file in os.listdir(directory):
-        file_name = os.fsdecode(file)
-        if not file_name.endswith(".jpeg"):
-            continue
-        user_image = face_recognition.load_image_file("images/"+str(file_name))
-        user_face_encoding = face_recognition.face_encodings(user_image)
-        if len(user_face_encoding) == 0:
-            continue
-        encodings_list = face_recognition.compare_faces([user_face_encoding][0], face)
-        print(encodings_list)
-        if True in encodings_list:
-            break
+def facial_recog_process(faces, temp):
+    for face in faces:
+        encodings = face_recognition.compare_faces(face, temp)
+
+
+    # directory = os.fsencode("images/")
+    # for file, f in os.listdir(directory), face:
+    #     file_name = os.fsdecode(file)
+    #     if not file_name.endswith(".jpeg"):
+    #         continue
+    #     user_image = face_recognition.load_image_file("images/"+str(file_name))
+    #     user_face_encoding = face_recognition.face_encodings(user_image)
+    #     if len(user_face_encoding) == 0:
+    #         continue
+    #     encodings_list = face_recognition.compare_faces([user_face_encoding][0], f[0])
+    #     print(encodings_list)
+    #     if True in encodings_list:
+    #         break
     names = ["Ryan Goluch"]
-    return encodings_list, names
+    return encodings, names
 
 # writes the facial data to DB
 def add_facial_data():
@@ -162,7 +165,7 @@ def scan_for_known_people(known_people_folder):
                 face_encodings.append(single_encoding[0])
 
                 #write to file, for performance reasons, so as to not calculate all the faces each time
-                encodedfile = np.save((os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"), single_encoding[0])
+                encodedfile = np.save((os.path.join(known_people_folder, filename) + ".npy"), single_encoding[0])
                 print("DEBUG: saved to document", filename)
                 print("DEBUG: saved to document", encodedfile)
 
@@ -173,6 +176,8 @@ def image_files_in_folder(folder):
     #following code snippet from face_recognition
     return [os.path.join(folder, f) for f in os.listdir(folder) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
 
+
+known_names, known_encodings = scan_for_known_people("images/known")
 
 while True:
     # video_server()
@@ -189,17 +194,22 @@ while True:
     face_locations = face_recognition.face_locations(rgb_small_frame)
     face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-    cv2.imwrite('images/known/temp.jpeg', small_frame)
-    temp = face_recognition.load_image_file("images/known/temp.jpeg")
+    cv2.imwrite('images/temp.jpeg', small_frame)
+    temp = face_recognition.load_image_file("images/temp.jpeg")
     temp_encode = face_recognition.face_encodings(temp)
-    matches, known_face_names = facial_recog_process(temp_encode[0]) # face_recognition.compare_faces(known_face_encodings, face_encoding)
+
+    for face in known_encodings:
+        encodings = face_recognition.compare_faces(face, temp_encode)
+
+    # matches, known_face_names = facial_recog_process(known_encodings, temp_encode) # face_recognition.compare_faces(known_face_encodings, face_encoding)
+    known_face_names = ["Ryan Goluch"]
     image_name = "Unknown"
 
-    if True in matches:
-        first_match_index = matches.index(True)
+    if True in encodings:
+        first_match_index = encodings.index(True)
         image_name = known_face_names[first_match_index]
         generate_json(image_name)
-    elif False in matches:
+    elif False in encodings:
         add_unknown_image()
         # cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
         generate_json(image_name)
