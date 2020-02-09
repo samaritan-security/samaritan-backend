@@ -69,7 +69,15 @@ def add_facial_data():
     return True
 
 
-# TODO add in temp access pics (idk if this needs a function)
+'''
+Function to add a face to temp_access directory
+'''
+
+
+def add_temp_data(name: str):
+    directory = os.fsencode("images/temp_access")
+    cv2.imwrite(dir+name, small_frame)
+
 '''
 Function to generate the JSON file for users' data
 '''
@@ -101,45 +109,63 @@ def add_unknown_image():
 Function to set up a server to send video feeds to front end
 '''
 def video_server():
-    host = ''
-    port = 8089
+    HOST = ''
+    PORT = 8089
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print('Socket created')
 
-    s.bind((host, port))
+    s.bind((HOST, PORT))
     print('Socket bind complete')
     s.listen(10)
     print('Socket now listening')
+
     conn, addr = s.accept()
-    ### new
-    data = bytes()
-    payload_size = struct.calcsize("H")
+
+    data = b'' ### CHANGED
+    payload_size = struct.calcsize("L") ### CHANGED
+
     while True:
+
+        # Retrieve message size
         while len(data) < payload_size:
             data += conn.recv(4096)
+
         packed_msg_size = data[:payload_size]
         data = data[payload_size:]
-        msg_size = struct.unpack("H", packed_msg_size)[0]
+        msg_size = struct.unpack("L", packed_msg_size)[0] ### CHANGED
+
+        # Retrieve all data based on message size
         while len(data) < msg_size:
             data += conn.recv(4096)
+
         frame_data = data[:msg_size]
         data = data[msg_size:]
-        ###
 
+        # Extract frame
         frame = pickle.loads(frame_data)
-        print(frame)
+
+        # Display
         cv2.imshow('frame', frame)
+        cv2.waitKey(1)
+
 
 
 def video_client():
-    cap = cv2.VideoCapture(0)
-    clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    clientsocket.connect(('localhost', 8089))
+    cap=cv2.VideoCapture("http://" + str(ip) + "/video.mjpg")
+    clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    clientsocket.connect(('localhost',8089))
+
     while True:
-        ret, frame = cap.read()
-        data = pickle.dumps(frame)  ### new code
-        clientsocket.sendall(struct.pack("H", len(data)) + data)  ### new code
+        ret,frame=cap.read()
+        # Serialize frame
+        data = pickle.dumps(frame)
+
+        # Send message length first
+        message_size = struct.pack("L", len(data)) ### CHANGED
+
+        # Then data
+        clientsocket.sendall(message_size + data)
 
 
 '''
@@ -202,8 +228,8 @@ Main script function
 video_capture = get_camera_ip_from_file("camera_ip.txt")
 known_names, known_encodings = scan_for_known_people("images/employees")
 
-# video_server()
-# video_client()
+video_server()
+video_client()
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
