@@ -1,3 +1,5 @@
 .idea
 samaritan-backend.iml
 venv/*
+.DS_Store
+__pycache__/
