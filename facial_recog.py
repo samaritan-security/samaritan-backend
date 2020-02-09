@@ -202,8 +202,8 @@ Main script function
 video_capture = get_camera_ip_from_file("camera_ip.txt")
 known_names, known_encodings = scan_for_known_people("images/employees")
 
-# video_server()
-# video_client()
+video_server()
+video_client()
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
