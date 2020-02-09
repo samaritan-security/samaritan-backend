@@ -15,11 +15,9 @@ import random
 import time
 import os
 import socket
-import sys
 import numpy as np
 import struct
 import json
-import datetime
 
 '''
 gets ips from file 
@@ -31,7 +29,7 @@ def get_camera_ip_from_file(filename: str):
     file = open(filename, "r")
     ip = file.readline()
     video_feed = cv2.VideoCapture("http://" + str(ip) + "/video.mjpg")
-    file.close()  # RYANN!! close your files!!
+    file.close()
     return video_feed
 
 
@@ -102,8 +100,6 @@ def add_unknown_image():
 '''
 Function to set up a server to send video feeds to front end
 '''
-
-
 def video_server():
     host = ''
     port = 8089
@@ -204,10 +200,10 @@ Main script function
 '''
 
 video_capture = get_camera_ip_from_file("camera_ip.txt")
-known_names, known_encodings = scan_for_known_people("images/known")
+known_names, known_encodings = scan_for_known_people("images/employees")
 
-video_server()
-video_client()
+# video_server()
+# video_client()
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
@@ -226,7 +222,7 @@ while True:
     temp_encode = face_recognition.face_encodings(temp)
 
     for face in known_encodings:
-        encodings = face_recognition.compare_faces(face, temp_encode)
+        encodings = face_recognition.compare_faces(temp_encode, face)
 
     known_face_names = ["Ryan Goluch"]
     image_name = "Unknown"
