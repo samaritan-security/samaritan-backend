@@ -2,3 +2,5 @@ cmake
 opencv-python
 numpy
 face-recognition
+requests
+bs4

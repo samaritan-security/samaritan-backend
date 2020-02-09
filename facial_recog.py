@@ -1,11 +1,11 @@
-'''
+"""
 Samaritan Security Facial Recognition Script
 
 SDMay20-45
 Dept. of Electrical and Computer Engineering
-Iowa State University 
+Iowa State University
 Author(s): Devin Uner, Ryan Goluch, Ann Gould
-'''
+"""
 import pickle
 import re
 import face_recognition
@@ -30,46 +30,52 @@ def get_camera_ip_from_file(filename: str):
     # Use a list of camera ips for ease of testing
     file = open(filename, "r")
     ip = file.readline()
-    # video_feed = cv2.VideoCapture(0)
     video_feed = cv2.VideoCapture("http://" + str(ip) + "/video.mjpg")
     file.close()  # RYANN!! close your files!!
     return video_feed
 
 
-# can return multiple different things in python (peep return statement)
+'''
+Function to add a new camera to the text file of camera IPs
+'''
+
+
+def add_camera_ip(ip: str):
+    with open("camera_ip.txt", "a") as file:
+        num = file.write("\n" + ip)
+    file.close()
+    if num > 0:
+        return True
+    return False
+
+
 '''
 loads facial recog image file, encodes and names known face
 '''
 
 
-def facial_recog_process(faces, temp):
+def facial_recog_process(faces):
     for face in faces:
         encodings = face_recognition.compare_faces(face, temp)
-
-
-    # directory = os.fsencode("images/")
-    # for file, f in os.listdir(directory), face:
-    #     file_name = os.fsdecode(file)
-    #     if not file_name.endswith(".jpeg"):
-    #         continue
-    #     user_image = face_recognition.load_image_file("images/"+str(file_name))
-    #     user_face_encoding = face_recognition.face_encodings(user_image)
-    #     if len(user_face_encoding) == 0:
-    #         continue
-    #     encodings_list = face_recognition.compare_faces([user_face_encoding][0], f[0])
-    #     print(encodings_list)
-    #     if True in encodings_list:
-    #         break
     names = ["Ryan Goluch"]
     return encodings, names
 
-# writes the facial data to DB
+
+'''
+Function to add the file path of an image to database
+'''
+
+
 def add_facial_data():
     # TODO
     return True
 
 
 # TODO add in temp access pics (idk if this needs a function)
+'''
+Function to generate the JSON file for users' data
+'''
+
 
 def generate_json(name: str) -> json:
     data = {"name": name, "date": str(datetime.datetime.now())}
@@ -77,8 +83,9 @@ def generate_json(name: str) -> json:
     return json.dumps(data)
 
 
-video_capture = get_camera_ip_from_file("camera_ip.txt")
-# known_face_encodings, known_face_names = facial_recog_process("images/Goluch_Ryan.jpeg")
+'''
+Function to add unknown images to the database of images
+'''
 
 
 def add_unknown_image():
@@ -90,6 +97,11 @@ def add_unknown_image():
         if filename.find(str(image_counter)):
             image_counter = random.randrange(int(time.time()))
     cv2.imwrite('images/unknown/%d.jpeg' % image_counter, small_frame)
+
+
+'''
+Function to set up a server to send video feeds to front end
+'''
 
 
 def video_server():
@@ -105,7 +117,7 @@ def video_server():
     print('Socket now listening')
     conn, addr = s.accept()
     ### new
-    data = ""
+    data = bytes()
     payload_size = struct.calcsize("H")
     while True:
         while len(data) < payload_size:
@@ -134,6 +146,11 @@ def video_client():
         clientsocket.sendall(struct.pack("H", len(data)) + data)  ### new code
 
 
+'''
+Function to pre-process the known images to help speed up facial recognition
+'''
+
+
 def scan_for_known_people(known_people_folder):
     names = []
     face_encodings = []
@@ -144,7 +161,7 @@ def scan_for_known_people(known_people_folder):
         image = face_recognition.load_image_file(file)
 
         if os.path.isfile(os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"):
-            #read from file, for performance reasons. useful for large batches of files
+            # read from file, for performance reasons. useful for large batches of files
             encodedfile = np.load((os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"))
 
             if encodedfile is not None:
@@ -164,7 +181,7 @@ def scan_for_known_people(known_people_folder):
                 names.append(filename)
                 face_encodings.append(single_encoding[0])
 
-                #write to file, for performance reasons, so as to not calculate all the faces each time
+                # write to file, for performance reasons, so as to not calculate all the faces each time
                 encodedfile = np.save((os.path.join(known_people_folder, filename) + ".npy"), single_encoding[0])
                 print("DEBUG: saved to document", filename)
                 print("DEBUG: saved to document", encodedfile)
@@ -172,16 +189,26 @@ def scan_for_known_people(known_people_folder):
     return names, face_encodings
 
 
+'''
+Helper function for image pre-processing
+'''
+
+
 def image_files_in_folder(folder):
-    #following code snippet from face_recognition
+    # following code snippet from face_recognition
     return [os.path.join(folder, f) for f in os.listdir(folder) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
 
 
+'''
+Main script function
+'''
+
+video_capture = get_camera_ip_from_file("camera_ip.txt")
 known_names, known_encodings = scan_for_known_people("images/known")
 
+video_server()
+video_client()
 while True:
-    # video_server()
-    # video_client()
     # Grab a single frame of video
     ret, frame = video_capture.read()
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
@@ -201,7 +228,6 @@ while True:
     for face in known_encodings:
         encodings = face_recognition.compare_faces(face, temp_encode)
 
-    # matches, known_face_names = facial_recog_process(known_encodings, temp_encode) # face_recognition.compare_faces(known_face_encodings, face_encoding)
     known_face_names = ["Ryan Goluch"]
     image_name = "Unknown"
 
@@ -211,48 +237,7 @@ while True:
         generate_json(image_name)
     elif False in encodings:
         add_unknown_image()
-        # cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
         generate_json(image_name)
-        # video_capture.release()
-        # cv2.destroyAllWindows()
-
-
-
-    # for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
-    #     # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-    #     top *= 4
-    #     right *= 4
-    #     bottom *= 4
-    #     left *= 4
-    #
-    #     # Draw a box around the face
-    #     cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-    #
-    #     # Draw a label with a name below the face
-    #     cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-    #     cv2.imwrite('images/temp.jpeg', small_frame)
-    #     temp = face_recognition.load_image_file("images/temp.jpeg")
-    #     temp_encode = face_recognition.face_encodings(temp)
-    #     matches, known_face_names = facial_recog_process(temp_encode[0]) # face_recognition.compare_faces(known_face_encodings, face_encoding)
-    #     image_name = "Unknown"
-    #
-    #     # If a match was found in known_face_encodings, just use the first one.
-    #     if True in matches:
-    #         first_match_index = matches.index(True)
-    #         image_name = known_face_names[first_match_index]
-    #         generate_json(image_name)
-    #     elif False in matches:
-    #         add_unknown_image()
-    #         # cv2.imwrite('images/%d.jpeg' %image_counter, small_frame)
-    #         generate_json(image_name)
-    #         # video_capture.release()
-    #         # cv2.destroyAllWindows()
-    #
-    #     font = cv2.FONT_HERSHEY_DUPLEX
-    #     cv2.putText(frame, image_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-
-    # Display the resulting image
-    # cv2.imshow('Video', frame)
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
