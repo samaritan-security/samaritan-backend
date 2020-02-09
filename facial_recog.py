@@ -78,7 +78,7 @@ Function to generate the JSON file for users' data
 
 
 def generate_json(name: str) -> json:
-    data = {"name": name, "date": str(datetime.datetime.now())}
+    data = {"name": name}
     print(data)
     return json.dumps(data)
 
