@@ -52,11 +52,11 @@ loads facial recog image file, encodes and names known face
 '''
 
 
-def facial_recog_process(faces):
+def facial_recog_process(faces, temp):
     for face in faces:
         encodings = face_recognition.compare_faces(face, temp)
-    names = ["Ryan Goluch"]
-    return encodings, names
+    # names = ["Ryan Goluch"]
+    return encodings
 
 
 '''
@@ -103,69 +103,6 @@ def add_unknown_image():
         if filename.find(str(image_counter)):
             image_counter = random.randrange(int(time.time()))
     cv2.imwrite('images/unknown/%d.jpeg' % image_counter, small_frame)
-
-
-'''
-Function to set up a server to send video feeds to front end
-'''
-def video_server():
-    HOST = ''
-    PORT = 8089
-
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print('Socket created')
-
-    s.bind((HOST, PORT))
-    print('Socket bind complete')
-    s.listen(10)
-    print('Socket now listening')
-
-    conn, addr = s.accept()
-
-    data = b'' ### CHANGED
-    payload_size = struct.calcsize("L") ### CHANGED
-
-    while True:
-
-        # Retrieve message size
-        while len(data) < payload_size:
-            data += conn.recv(4096)
-
-        packed_msg_size = data[:payload_size]
-        data = data[payload_size:]
-        msg_size = struct.unpack("L", packed_msg_size)[0] ### CHANGED
-
-        # Retrieve all data based on message size
-        while len(data) < msg_size:
-            data += conn.recv(4096)
-
-        frame_data = data[:msg_size]
-        data = data[msg_size:]
-
-        # Extract frame
-        frame = pickle.loads(frame_data)
-
-        # Display
-        cv2.imshow('frame', frame)
-        cv2.waitKey(1)
-
-
-
-def video_client():
-    cap=cv2.VideoCapture("http://" + str(ip) + "/video.mjpg")
-    clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    clientsocket.connect(('localhost',8089))
-
-    while True:
-        ret,frame=cap.read()
-        # Serialize frame
-        data = pickle.dumps(frame)
-
-        # Send message length first
-        message_size = struct.pack("L", len(data)) ### CHANGED
-
-        # Then data
-        clientsocket.sendall(message_size + data)
 
 
 '''
@@ -227,13 +164,12 @@ Main script function
 
 video_capture = get_camera_ip_from_file("camera_ip.txt")
 known_names, known_encodings = scan_for_known_people("images/employees")
+encodings = []
 
-video_server()
-video_client()
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
 
     # Convert the image from BGR color (which OpenCV uses) 
     # to RGB color (which face_recognition uses)
@@ -246,16 +182,17 @@ while True:
     cv2.imwrite('images/temp.jpeg', small_frame)
     temp = face_recognition.load_image_file("images/temp.jpeg")
     temp_encode = face_recognition.face_encodings(temp)
+    if len(temp_encode) == 0:
+        continue
 
     for face in known_encodings:
-        encodings = face_recognition.compare_faces(temp_encode, face)
+        r = face_recognition.compare_faces(temp_encode, face)
+        encodings.append(r.pop())
 
-    known_face_names = ["Ryan Goluch"]
     image_name = "Unknown"
-
     if True in encodings:
         first_match_index = encodings.index(True)
-        image_name = known_face_names[first_match_index]
+        image_name = known_names[first_match_index]
         generate_json(image_name)
     elif False in encodings:
         add_unknown_image()
