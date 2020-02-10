@@ -15,7 +15,8 @@ import os
 import numpy as np
 import json
 
-from app import users
+from app import add_users
+
 
 def get_camera_ip_from_file(filename: str):
     file = open(filename, "r")
@@ -99,5 +100,5 @@ Function to add the file path of an image to database
 '''
 def add_facial_data(name: str, image_path: str):
     data = {"name": name, "image": image_path}
-    return users(data)
+    return add_users(data)
 

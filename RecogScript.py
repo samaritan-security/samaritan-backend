@@ -55,7 +55,7 @@ known_names, known_encodings = scan_for_known_people("images/employees")
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
 
     # Convert the image from BGR color (which OpenCV uses) 
     # to RGB color (which face_recognition uses)
@@ -79,6 +79,8 @@ while True:
     if True in encodings:
         first_match_index = encodings.index(True)
         person_name = known_face_names[first_match_index]
+        # TODO: NEEDS TO BE FIXED!!!!!!!!
+        path = "images/employees" + person_name
         add_facial_data(person_name, path)
         generate_json(person_name)
     elif False in encodings:

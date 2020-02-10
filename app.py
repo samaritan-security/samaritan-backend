@@ -28,7 +28,7 @@ adds new user
 TODO: I don't like how this is done right now even though it works.
 """
 @app.route('/user', methods=['POST'])
-def users(*args):
+def add_users(*args):
     flag = False
     if args is not None:
         data = args[0]
@@ -60,10 +60,8 @@ removes new user
 """
 returns all users 
 """
-
-
 @app.route('/allUsers', methods=['GET'])
-def get_users():
+def get_all_users():
     entries = []
     cursor = db.user.find({})
     for document in cursor:
@@ -76,10 +74,8 @@ def get_users():
 """
 given user_id, returns user 
 """
-
-
 @app.route('/user/<user_id>', methods=['GET'])
-def get_user(user_id: str):
+def get_user_by_id(user_id: str):
     user = db.user.find_one({"_id": ObjectId(user_id)})
     user.pop('_id')
     return json.dumps(user)
