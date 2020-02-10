@@ -119,7 +119,7 @@ def add_unknown():
 """
 returns all unknown images
 """
-@app.route('/allUnknown', methods=['GET'])
+@app.route('/unknown', methods=['GET'])
 def get_all_unknown():
     entries = []
     cursor = db.unknown.find({})
