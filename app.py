@@ -9,7 +9,8 @@ from mongoengine import connect
 
 
 app = Flask(__name__)
-client: MongoClient = MongoClient("localhost:27017")
+client: MongoClient = MongoClient(
+    "localhost:27017")
 
 db = client.user  # need for non graphql routes that access db
 
@@ -31,7 +32,7 @@ adds new user
 def user():
     data = request.get_json("data")
     name = data["name"]
-    image = data["image"]
+    image = request.files['img']
     user = {
         "name": name,
         "image": image,
