@@ -1,6 +1,6 @@
 '''
 Samaritan Security Facial Recognition Script Functions:
-    Functions for use in facial_recog.py
+    Functions for use in RecogScript.py
 
 SDMay20-45
 Dept. of Electrical and Computer Engineering
@@ -8,49 +8,47 @@ Iowa State University
 Author(s): Devin Uner, Ryan Goluch, Ann Gould
 '''
 
-import pickle
 import re
 import face_recognition
 import cv2
-from random import seed
-import random
-import time
 import os
-import socket
-import sys
 import numpy as np
-import struct
 import json
-import datetime
 
-from facial_recog import small_frame
-
+from app import users
 
 def get_camera_ip_from_file(filename: str):
-    # Use a list of camera ips for ease of testing
     file = open(filename, "r")
     ip = file.readline()
-    # video_feed = cv2.VideoCapture(0)
     video_feed = cv2.VideoCapture("http://" + str(ip) + "/video.mjpg")
-    file.close()  # RYANN!! close your files!!
+    file.close()
     return video_feed
 
+
+'''
+Function to generate the JSON file for users' data
+'''
 def generate_json(name: str) -> json:
-    data = {"name": name, "date": str(datetime.datetime.now())}
+    data = {"name": name}
     print(data)
     return json.dumps(data)
 
-def add_unknown_image():
-    seed(time.time())
-    image_counter = random.randrange(int(time.time()))
-    directory = os.fsencode("images/unknown")
-    for file in os.listdir(directory):
-        filename = os.fsdecode(file)
-        if filename.find(str(image_counter)):
-            image_counter = random.randrange(int(time.time()))
-    cv2.imwrite('images/unknown/%d.jpeg' % image_counter, small_frame)
+'''
+Function to add a new camera to the text file of camera IPs
+'''
+def add_camera_ip(ip: str):
+    with open("camera_ip.txt", "a") as file:
+        num = file.write("\n" + ip)
+    file.close()
+    if num > 0:
+        return True
+    return False
 
 
+
+'''
+Function to pre-process the known images to help speed up facial recognition
+'''
 def scan_for_known_people(known_people_folder):
     names = []
     face_encodings = []
@@ -61,7 +59,7 @@ def scan_for_known_people(known_people_folder):
         image = face_recognition.load_image_file(file)
 
         if os.path.isfile(os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"):
-            #read from file, for performance reasons. useful for large batches of files
+            # read from file, for performance reasons. useful for large batches of files
             encodedfile = np.load((os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"))
 
             if encodedfile is not None:
@@ -81,7 +79,7 @@ def scan_for_known_people(known_people_folder):
                 names.append(filename)
                 face_encodings.append(single_encoding[0])
 
-                #write to file, for performance reasons, so as to not calculate all the faces each time
+                # write to file, for performance reasons, so as to not calculate all the faces each time
                 encodedfile = np.save((os.path.join(known_people_folder, filename) + ".npy"), single_encoding[0])
                 print("DEBUG: saved to document", filename)
                 print("DEBUG: saved to document", encodedfile)
@@ -89,6 +87,17 @@ def scan_for_known_people(known_people_folder):
     return names, face_encodings
 
 
+'''
+Helper function for image pre-processing
+'''
 def image_files_in_folder(folder):
-    #following code snippet from face_recognition
+    # following code snippet from face_recognition
     return [os.path.join(folder, f) for f in os.listdir(folder) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
+
+'''
+Function to add the file path of an image to database
+'''
+def add_facial_data(name: str, image_path: str):
+    data = {"name": name, "image": image_path}
+    return users(data)
+
