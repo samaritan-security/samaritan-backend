@@ -39,7 +39,7 @@ def add_users(*args):
     else:
         data = request.get_json("data")
     name = data["name"]
-    image = data["img"]
+    image = data["image"]
     user = {
         "name": name,
         "image": image,
