@@ -1,4 +1,4 @@
-from flask import Flask, render_template, make_response, request
+from flask import Flask, render_template, make_response, request, jsonify
 from pymongo import MongoClient
 import json
 from flask_graphql import GraphQLView
@@ -111,7 +111,10 @@ def get_all_known():
         document['_id'] = str(document['_id'])
         entries.append(document)
 
-    return json.dumps(entries)
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
 
 
 """
@@ -139,7 +142,10 @@ def get_all_unknown():
         document['_id'] = str(document['_id'])
         entries.append(document)
 
-    return json.dumps(entries)
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
 
 
 """
