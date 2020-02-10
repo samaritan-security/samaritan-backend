@@ -10,7 +10,9 @@ from mongoengine import connect
 
 app = Flask(__name__)
 client: MongoClient = MongoClient("localhost:27017")
+
 db = client.user  # need for non graphql routes that access db
+
 DEFAULT_CONNECTION_NAME = connect('user')  # need this for graphql
 
 """
@@ -68,6 +70,64 @@ def get_user(user_id: str):
     user = db.user.find_one({"_id": ObjectId(user_id)})
     user.pop('_id')
     return json.dumps(user)
+
+
+"""
+adds new known image
+"""
+@app.route('/known', methods=['POST'])
+def add_known():
+    data = request.get_json("data")
+    img = data['img']
+    name = data['name']
+    known = {
+        "name": name,
+        "img": img
+    }
+    result = db.known.insert_one(known)
+    return make_response()
+
+
+"""
+returns all known images
+"""
+@app.route('/known', methods=['GET'])
+def get_all_known():
+    entries = []
+    cursor = db.known.find({})
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        entries.append(document)
+
+    return json.dumps(entries)
+
+
+"""
+adds new unknown image
+"""
+@app.route('/unknown', methods=['POST'])
+def add_unknown():
+    data = request.get_json("data")
+    img = data['img']
+    known = {
+        "img": img
+    }
+    result = db.unknown.insert_one(known)
+    return make_response()
+
+
+"""
+returns all unknown images
+"""
+@app.route('/allUnknown', methods=['GET'])
+def get_all_unknown():
+    entries = []
+    cursor = db.unknown.find({})
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        entries.append(document)
+
+    return json.dumps(entries)
 
 
 """
