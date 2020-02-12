@@ -102,3 +102,9 @@ def add_facial_data(name: str, image_path: str):
     data = {"name": name, "image": image_path}
     return add_users(data)
 
+def add_to_known_stream(name: str, encoded_image: str):
+    data = {"name": name, "image": encoded_image}
+
+def add_to_unknown_stream(encoded_image: str):
+    data = {"image": encoded_image}
+
