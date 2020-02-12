@@ -10,6 +10,8 @@ Author(s): Devin Uner, Ryan Goluch, Ann Gould
 import time
 from random import seed
 import random as rand
+import base64
+
 
 from FacialRecog import *
 
@@ -28,7 +30,7 @@ def facial_recog_process(faces):
 Function to add unknown images to the database of images
 Returns image path
 '''
-def add_unknown_image():
+def add_unknown_image(img):
     seed(time.time())
     image_counter = rand.randrange(int(time.time()))
     directory = os.fsencode("images/unknown")
@@ -37,7 +39,7 @@ def add_unknown_image():
         if filename.find(str(image_counter)):
             image_counter = rand.randrange(int(time.time()))
     image_location = 'images/unknown/%d.jpeg' % image_counter
-    cv2.imwrite(image_location, small_frame)
+    cv2.imwrite(image_location, img)
     return image_location
 
 
@@ -69,8 +71,9 @@ while True:
     temp = face_recognition.load_image_file("images/temp.jpeg")
     temp_encode = face_recognition.face_encodings(temp)
 
+    encodings = []
     for face in known_encodings:
-        encodings = face_recognition.compare_faces(temp_encode, face)
+        encodings += face_recognition.compare_faces(temp_encode, face)
 
     known_face_names = ["Ryan Goluch"]
     person_name = "Unknown"
@@ -79,11 +82,17 @@ while True:
     if True in encodings:
         first_match_index = encodings.index(True)
         person_name = known_face_names[first_match_index]
-        # TODO: NEEDS TO BE FIXED!!!!!!!!
-        path = "images/employees" + person_name
-        add_facial_data(person_name, path)
+        path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
+        image = open(path, "rb")
+        image_encoded = base64.b64encode(image.read())
+        # print(image_encoded)
+        add_to_known_stream(person_name, image_encoded)
         generate_json(person_name)
+        image.close()
     elif False in encodings:
-        path = add_unknown_image()
-        add_facial_data(person_name, path)
+        path = "images/temp.jpeg"
+        image = cv2.imread(path)
+        path = add_unknown_image(image)
+        unknown = base64.b64encode(image)
+        add_to_unknown_stream(unknown)
         generate_json(person_name)

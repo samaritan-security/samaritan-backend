@@ -141,7 +141,6 @@ def add_unknown_to_stream(*args):
         flag = True
     else:
         data = request.get_json("data")
-    data = request.get_json("data")
     img = data['img']
     known = {
         "img": img
