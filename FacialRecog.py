@@ -15,13 +15,13 @@ import os
 import numpy as np
 import json
 
-from app import add_users
+from app import add_users, add_known_to_stream, add_unknown_to_stream
 
 
 def get_camera_ip_from_file(filename: str):
     file = open(filename, "r")
     ip = file.readline()
-    video_feed = cv2.VideoCapture("http://" + str(ip) + "/video.mjpg")
+    video_feed = cv2.VideoCapture("http://" + str(ip).replace("\n", "") + "/video.mjpg")
     file.close()
     return video_feed
 
@@ -102,9 +102,17 @@ def add_facial_data(name: str, image_path: str):
     data = {"name": name, "image": image_path}
     return add_users(data)
 
-def add_to_known_stream(name: str, encoded_image: str):
-    data = {"name": name, "image": encoded_image}
+'''
+Updates the known persons in the frame from the facial recog script
+'''
+def add_to_known_stream(name: str, encoded_image):
+    data = {"name": name, "img": encoded_image}
+    return add_known_to_stream(data)
 
+'''
+Updates the unknown persons in the frame from facial recog script
+'''
 def add_to_unknown_stream(encoded_image: str):
-    data = {"image": encoded_image}
+    data = {"img": encoded_image}
+    return add_unknown_to_stream(data)
 

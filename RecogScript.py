@@ -12,6 +12,7 @@ from random import seed
 import random as rand
 import base64
 
+
 from FacialRecog import *
 
 '''
@@ -66,12 +67,13 @@ while True:
     face_locations = face_recognition.face_locations(rgb_small_frame)
     face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-    to_be_id = cv2.imwrite('images/temp.jpeg', small_frame)
+    cv2.imwrite('images/temp.jpeg', small_frame)
     temp = face_recognition.load_image_file("images/temp.jpeg")
     temp_encode = face_recognition.face_encodings(temp)
 
+    encodings = []
     for face in known_encodings:
-        encodings = face_recognition.compare_faces(temp_encode, face)
+        encodings += face_recognition.compare_faces(temp_encode, face)
 
     known_face_names = ["Ryan Goluch"]
     person_name = "Unknown"
@@ -80,13 +82,17 @@ while True:
     if True in encodings:
         first_match_index = encodings.index(True)
         person_name = known_face_names[first_match_index]
-        path = "images/employees/" + str(person_name)
-        image = cv2.imread(path)
-        image_encoded = base64.b64encode(image)
+        path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
+        image = open(path, "rb")
+        image_encoded = base64.b64encode(image.read())
+        # print(image_encoded)
         add_to_known_stream(person_name, image_encoded)
         generate_json(person_name)
+        image.close()
     elif False in encodings:
-        path = add_unknown_image(to_be_id)
-        unknown = base64.b64encode(to_be_id)
+        path = "images/temp.jpeg"
+        image = cv2.imread(path)
+        path = add_unknown_image(image)
+        unknown = base64.b64encode(image)
         add_to_unknown_stream(unknown)
         generate_json(person_name)

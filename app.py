@@ -135,13 +135,12 @@ unknown people in the camera feed.
 """
 @app.route('/unknown', methods=['POST'])
 def add_unknown_to_stream(*args):
-     flag = False
+    flag = False
     if args is not None:
         data = args[0]
         flag = True
     else:
         data = request.get_json("data")
-    data = request.get_json("data")
     img = data['img']
     known = {
         "img": img
