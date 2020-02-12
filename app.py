@@ -16,8 +16,8 @@ db = client.user  # need for non graphql routes that access db
 DEFAULT_CONNECTION_NAME = connect('user')  # need this for graphql
 
 """
-initial endpoint for sample application 
-all rendered templates need to be put in a templates folder 
+initial endpoint for sample application
+all rendered templates need to be put in a templates folder
 """
 
 
@@ -27,7 +27,7 @@ def index():
 
 
 """
-adds new user 
+adds new user
 TODO: I don't like how this is done right now even though it works.
 """
 @app.route('/user', methods=['POST'])
@@ -54,14 +54,14 @@ def add_users(*args):
 
 
 """
-removes new user 
+removes new user
 """
 # @app.route('/user', methods=['DELETE'])
 # def user():
 #     # TODO :)
 
 """
-returns all users 
+returns all users
 """
 @app.route('/allUsers', methods=['GET'])
 def get_all_users():
@@ -75,7 +75,7 @@ def get_all_users():
 
 
 """
-given user_id, returns user 
+given user_id, returns user
 """
 @app.route('/user/<user_id>', methods=['GET'])
 def get_user_by_id(user_id: str):
@@ -85,11 +85,18 @@ def get_user_by_id(user_id: str):
 
 
 """
-adds new known image
+adds new known name and image to stream.
+the stream represents the current
+known people in the camera feed.
 """
 @app.route('/known', methods=['POST'])
-def add_known():
-    data = request.get_json("data")
+def add_known_to_stream(*args):
+    flag = False
+    if args is not None:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json("data")
     img = data['img']
     name = data['name']
     known = {
@@ -97,6 +104,10 @@ def add_known():
         "img": img
     }
     result = db.known.insert_one(known)
+    if flag:
+        if result is not None:
+            return "Success"
+        raise RuntimeError(result)
     return make_response()
 
 
@@ -118,16 +129,28 @@ def get_all_known():
 
 
 """
-adds new unknown image
+adds new unknown image to stream.
+the stream represents the current
+unknown people in the camera feed.
 """
 @app.route('/unknown', methods=['POST'])
-def add_unknown():
+def add_unknown_to_stream(*args):
+     flag = False
+    if args is not None:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json("data")
     data = request.get_json("data")
     img = data['img']
     known = {
         "img": img
     }
     result = db.unknown.insert_one(known)
+    if flag:
+        if result is not None:
+            return "Success"
+        raise RuntimeError(result)
     return make_response()
 
 
