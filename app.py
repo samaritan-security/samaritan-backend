@@ -171,6 +171,20 @@ def get_all_unknown():
 
 
 """
+route to delete all known and unknown until we 
+figure it out
+
+TODO: remove this when stuff is good
+"""
+@app.route('/test', methods=['DELETE'])
+def delete_all_known_unknown():
+    db.unknown.remove({})
+    db.known.remove({})
+
+    return make_response()
+
+
+"""
 graphql route
 """
 app.add_url_rule(
