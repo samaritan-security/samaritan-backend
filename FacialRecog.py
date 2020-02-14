@@ -18,6 +18,10 @@ import json
 from app import add_users, add_known_to_stream, add_unknown_to_stream
 
 
+def get_video_from_file(filename: str):
+    return cv2.VideoCapture(filename)
+
+
 def get_camera_ip_from_file(filename: str):
     file = open(filename, "r")
     ip = file.readline()

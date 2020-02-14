@@ -16,17 +16,6 @@ import base64
 from FacialRecog import *
 
 '''
-loads facial recog image file, encodes and names known face
-'''
-
-
-def facial_recog_process(faces):
-    for face in faces:
-        encodings = face_recognition.compare_faces(face, temp)
-    names = ["Ryan Goluch"]
-    return encodings, names
-
-'''
 Function to add unknown images to the database of images
 Returns image path
 '''
@@ -46,20 +35,14 @@ def add_unknown_image(img):
 # TODO add in temp access pics (idk if this needs a function)
 
 
-'''
-Main script function
-'''
+# refactor images directory to be a list of directories probably?
+def process_video_to_encode(video_feed, images_directory, temp_filename="images/temp.jpeg"):
 
-# TODO: this line should be changed for when @rgoluch adds video footage :)
-video_capture = get_camera_ip_from_file("camera_ip.txt")
-known_names, known_encodings = scan_for_known_people("images/employees")
-
-while True:
-    # Grab a single frame of video
-    ret, frame = video_capture.read()
+    known_names, known_encodings = scan_for_known_people(images_directory)
+    ret, frame = video_feed.read()
     small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
 
-    # Convert the image from BGR color (which OpenCV uses) 
+    # Convert the image from BGR color (which OpenCV uses)
     # to RGB color (which face_recognition uses)
     rgb_small_frame = small_frame[:, :, ::-1]
 
@@ -67,32 +50,49 @@ while True:
     face_locations = face_recognition.face_locations(rgb_small_frame)
     face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-    cv2.imwrite('images/temp.jpeg', small_frame)
-    temp = face_recognition.load_image_file("images/temp.jpeg")
+    cv2.imwrite(temp_filename, small_frame)
+    temp = face_recognition.load_image_file(temp_filename)
     temp_encode = face_recognition.face_encodings(temp)
 
     encodings = []
     for face in known_encodings:
         encodings += face_recognition.compare_faces(temp_encode, face)
 
-    known_face_names = ["Ryan Goluch"]
-    person_name = "Unknown"
-    data = None
+    return encodings
 
-    if True in encodings:
-        first_match_index = encodings.index(True)
-        person_name = known_face_names[first_match_index]
-        path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
-        image = open(path, "rb")
-        image_encoded = base64.b64encode(image.read())
-        # print(image_encoded)
-        add_to_known_stream(person_name, image_encoded)
-        generate_json(person_name)
-        image.close()
-    elif False in encodings:
-        path = "images/temp.jpeg"
-        image = cv2.imread(path)
-        path = add_unknown_image(image)
-        unknown = base64.b64encode(image)
-        add_to_unknown_stream(unknown)
-        generate_json(person_name)
+
+
+'''
+Main script function
+'''
+def main():
+    video_capture = get_camera_ip_from_file("camera_ip.txt")
+
+    while True:
+
+        encodings = process_video_to_encode(video_capture, "images/employees")
+        known_face_names = ["Ryan Goluch"]
+        person_name = "Unknown"
+        data = None
+
+        if True in encodings:
+            first_match_index = encodings.index(True)
+            person_name = known_face_names[first_match_index]
+            path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
+            image = open(path, "rb")
+            image_encoded = base64.b64encode(image.read())
+            # print(image_encoded)
+            add_to_known_stream(person_name, image_encoded)
+            generate_json(person_name)
+            image.close()
+        elif False in encodings:
+            path = "images/temp.jpeg"
+            image = cv2.imread(path)
+            path = add_unknown_image(image)
+            unknown = base64.b64encode(image)
+            add_to_unknown_stream(unknown)
+            generate_json(person_name)
+
+
+if __name__== "__main__":
+    main()
