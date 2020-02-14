@@ -96,7 +96,7 @@ def add_known_to_stream(*args):
         data = args[0]
         flag = True
     else:
-    data = request.get_json("data")
+        data = request.get_json("data")
     img = data['img']
     name = data['name']
     known = {
@@ -128,6 +128,7 @@ def get_all_known():
     cursor = db.known.find({})
     for document in cursor:
         document['_id'] = str(document['_id'])
+        document['img'] = str(document['img'])
         entries.append(document)
 
     response = jsonify(entries)
@@ -148,7 +149,7 @@ def add_unknown_to_stream(*args):
         data = args[0]
         flag = True
     else:
-    data = request.get_json("data")
+        data = request.get_json("data")
     img = data['img']
     known = {
         "img": img
@@ -177,6 +178,7 @@ def get_all_unknown():
     cursor = db.unknown.find({})
     for document in cursor:
         document['_id'] = str(document['_id'])
+        document['img'] = str(document['img'])
         entries.append(document)
 
     response = jsonify(entries)
