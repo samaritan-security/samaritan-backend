@@ -96,14 +96,22 @@ def add_known_to_stream(*args):
         data = args[0]
         flag = True
     else:
-        data = request.get_json("data")
+    data = request.get_json("data")
     img = data['img']
     name = data['name']
     known = {
         "name": name,
         "img": img
     }
-    result = db.known.insert_one(known)
+    # result = db.known.insert_one(known)
+    result = db.known.update_one({
+        'name': known['name']
+    }, {
+        '$set': {
+            'name': known['name'],
+            'img': known['img']
+        }
+    }, upsert=True)
     if flag:
         if result is not None:
             return "Success"
@@ -140,12 +148,19 @@ def add_unknown_to_stream(*args):
         data = args[0]
         flag = True
     else:
-        data = request.get_json("data")
+    data = request.get_json("data")
     img = data['img']
     known = {
         "img": img
     }
-    result = db.unknown.insert_one(known)
+    # result = db.unknown.insert_one(known)
+    result = db.unknown.update_one({
+        'img': known['img']
+    }, {
+        '$set': {
+            'img': known['img']
+        }
+    }, upsert=True)
     if flag:
         if result is not None:
             return "Success"
