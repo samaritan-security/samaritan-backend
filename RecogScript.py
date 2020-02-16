@@ -71,8 +71,7 @@ while True:
         if entry:
             match_index = encodings.index(entry)
             person_name = known_names[match_index]
-            path = "images/employees/" + \
-                person_name.replace(" ", "_") + ".jpeg"
+            path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
             image = open(path, "rb")
             image_encoded = base64.b64encode(image.read())
             image_encoded = image_encoded.decode('utf-8')
@@ -81,7 +80,8 @@ while True:
             image.close()
         elif not entry:
             path = add_unknown_image(small_frame)
-            unknown = base64.b64encode(small_frame)
+            unknown_image = open(path, "rb")
+            unknown = base64.b64encode(unknown_image.read())
             unknown = unknown.decode('utf-8')
             add_to_unknown_stream(unknown)
             generate_json(person_name)
