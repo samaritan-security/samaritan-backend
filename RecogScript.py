@@ -67,16 +67,15 @@ while True:
 
     # Find all the faces and face encodings in the current frame of video
     face_locations = face_recognition.face_locations(rgb_small_frame)
-    face_encodings = face_recognition.face_encodings(
-        rgb_small_frame, face_locations)
+    face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-    cv2.imwrite('images/temp.jpeg', small_frame)
-    temp = face_recognition.load_image_file("images/temp.jpeg")
-    temp_encode = face_recognition.face_encodings(temp)
+    temp_encode = face_recognition.face_encodings(small_frame)
+    if len(temp_encode) == 0:
+        continue
 
     encodings = []
     for face in known_encodings:
-        encodings += face_recognition.compare_faces(temp_encode, face)
+        encodings += face_recognition.compare_faces(face, temp_encode)
 
     person_name = "Unknown"
     data = None
@@ -89,15 +88,12 @@ while True:
             image = open(path, "rb")
             image_encoded = base64.b64encode(image.read())
             image_encoded = image_encoded.decode('utf-8')
-            # print(image_encoded)
             add_to_known_stream(person_name, image_encoded)
             generate_json(person_name)
             image.close()
         elif not entry:
-            path = "images/temp.jpeg"
-            image = cv2.imread(path)
-            path = add_unknown_image(image)
-            unknown = base64.b64encode(image)
+            path = add_unknown_image(small_frame)
+            unknown = base64.b64encode(small_frame)
             unknown = unknown.decode('utf-8')
             add_to_unknown_stream(unknown)
             generate_json(person_name)
