@@ -15,18 +15,6 @@ import base64
 from FacialRecog import *
 
 '''
-loads facial recog image file, encodes and names known face
-'''
-
-
-def facial_recog_process(faces):
-    for face in faces:
-        encodings = face_recognition.compare_faces(face, temp)
-    names = ["Ryan Goluch"]
-    return encodings, names
-
-
-'''
 Function to add unknown images to the database of images
 Returns image path
 '''
