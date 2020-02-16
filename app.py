@@ -70,7 +70,6 @@ def get_all_users():
     for document in cursor:
         document['_id'] = str(document['_id'])
         entries.append(document)
-
     return json.dumps(entries)
 
 
@@ -96,7 +95,7 @@ def add_known_to_stream(*args):
         data = args[0]
         flag = True
     else:
-    data = request.get_json("data")
+        data = request.get_json("data")
     img = data['img']
     name = data['name']
     known = {
@@ -148,7 +147,7 @@ def add_unknown_to_stream(*args):
         data = args[0]
         flag = True
     else:
-    data = request.get_json("data")
+        data = request.get_json("data")
     img = data['img']
     known = {
         "img": img
