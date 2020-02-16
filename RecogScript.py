@@ -78,18 +78,17 @@ while True:
     for face in known_encodings:
         encodings += face_recognition.compare_faces(temp_encode, face)
 
-    known_face_names = ["Ryan Goluch"]
     person_name = "Unknown"
     data = None
-
     for entry in encodings:
         if entry:
             match_index = encodings.index(entry)
-            person_name = known_face_names[match_index]
+            person_name = known_names[match_index]
             path = "images/employees/" + \
                 person_name.replace(" ", "_") + ".jpeg"
             image = open(path, "rb")
             image_encoded = base64.b64encode(image.read())
+            image_encoded = image_encoded.decode('utf-8')
             # print(image_encoded)
             add_to_known_stream(person_name, image_encoded)
             generate_json(person_name)
@@ -99,23 +98,6 @@ while True:
             image = cv2.imread(path)
             path = add_unknown_image(image)
             unknown = base64.b64encode(image)
+            unknown = unknown.decode('utf-8')
             add_to_unknown_stream(unknown)
             generate_json(person_name)
-
-    # if True in encodings:
-    #     first_match_index = encodings.index(True)
-    #     person_name = known_face_names[first_match_index]
-    #     path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
-    #     image = open(path, "rb")
-    #     image_encoded = base64.b64encode(image.read())
-    #     # print(image_encoded)
-    #     add_to_known_stream(person_name, image_encoded)
-    #     generate_json(person_name)
-    #     image.close()
-    # elif False in encodings:
-    #     path = "images/temp.jpeg"
-    #     image = cv2.imread(path)
-    #     path = add_unknown_image(image)
-    #     unknown = base64.b64encode(image)
-    #     add_to_unknown_stream(unknown)
-    #     generate_json(person_name)
