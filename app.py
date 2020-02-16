@@ -70,7 +70,6 @@ def get_all_users():
     for document in cursor:
         document['_id'] = str(document['_id'])
         entries.append(document)
-
     return json.dumps(entries)
 
 
