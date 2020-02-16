@@ -26,10 +26,13 @@ def facial_recog_process(faces):
     names = ["Ryan Goluch"]
     return encodings, names
 
+
 '''
 Function to add unknown images to the database of images
 Returns image path
 '''
+
+
 def add_unknown_image(img):
     seed(time.time())
     image_counter = rand.randrange(int(time.time()))
@@ -59,13 +62,14 @@ while True:
     ret, frame = video_capture.read()
     small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
 
-    # Convert the image from BGR color (which OpenCV uses) 
+    # Convert the image from BGR color (which OpenCV uses)
     # to RGB color (which face_recognition uses)
     rgb_small_frame = small_frame[:, :, ::-1]
 
     # Find all the faces and face encodings in the current frame of video
     face_locations = face_recognition.face_locations(rgb_small_frame)
-    face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+    face_encodings = face_recognition.face_encodings(
+        rgb_small_frame, face_locations)
 
     cv2.imwrite('images/temp.jpeg', small_frame)
     temp = face_recognition.load_image_file("images/temp.jpeg")
@@ -81,10 +85,14 @@ while True:
 
     if True in encodings:
         first_match_index = encodings.index(True)
-        person_name = known_face_names[first_match_index]
+        # print(first_match_index)
+        # print(known_face_names)
+        # print(len(known_face_names))
+        person_name = known_names[first_match_index]
         path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
         image = open(path, "rb")
-        image_encoded = base64.b64encode(image.read())
+        image_b64 = base64.b64encode(image.read())
+        image_encoded = image_b64.decode('utf-8')
         # print(image_encoded)
         add_to_known_stream(person_name, image_encoded)
         generate_json(person_name)
