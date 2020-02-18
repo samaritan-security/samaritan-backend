@@ -63,12 +63,19 @@ while True:
 
     encodings = []
     for face in known_encodings:
-        encodings += face_recognition.compare_faces(face, temp_encode)
+        if len(temp_encode) == 1:
+            temp = []
+            temp.append(face_recognition.compare_faces(face, temp_encode))
+            encodings.append(temp)
+        else:
+            encodings.append(face_recognition.compare_faces(face, temp_encode))
+
+
 
     person_name = "Unknown"
     data = None
     for entry in encodings:
-        if entry:
+        if True in entry[:len(entry)]:
             match_index = encodings.index(entry)
             person_name = known_names[match_index]
             path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
