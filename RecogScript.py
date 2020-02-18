@@ -85,7 +85,7 @@ while True:
             add_to_known_stream(person_name, image_encoded)
             generate_json(person_name)
             image.close()
-        elif not entry:
+        else:
             path = add_unknown_image(small_frame)
             unknown_image = open(path, "rb")
             unknown = base64.b64encode(unknown_image.read())
