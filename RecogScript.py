@@ -36,17 +36,11 @@ def add_unknown_image(img):
 # TODO add in temp access pics (idk if this needs a function)
 
 
-'''
-Main script function
-'''
+# refactor images directory to be a list of directories probably?
+def process_video_to_encode(video_feed, images_directory, temp_filename="images/temp.jpeg"):
 
-# TODO: this line should be changed for when @rgoluch adds video footage :)
-video_capture = get_camera_ip_from_file("camera_ip.txt")
-known_names, known_encodings = scan_for_known_people("images/employees")
-
-while True:
-    # Grab a single frame of video
-    ret, frame = video_capture.read()
+    known_names, known_encodings = scan_for_known_people(images_directory)
+    ret, frame = video_feed.read()
     small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
 
     # Convert the image from BGR color (which OpenCV uses)
@@ -57,38 +51,47 @@ while True:
     face_locations = face_recognition.face_locations(rgb_small_frame)
     face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-    temp_encode = face_recognition.face_encodings(small_frame)
-    if len(temp_encode) == 0:
-        continue
+    cv2.imwrite(temp_filename, small_frame)
+    temp = face_recognition.load_image_file(temp_filename)
+    temp_encode = face_recognition.face_encodings(temp)
 
-    encodings = []
-    for face in known_encodings:
-        if len(temp_encode) == 1:
-            temp = []
-            temp.append(face_recognition.compare_faces(face, temp_encode))
-            encodings.append(temp)
-        else:
-            encodings.append(face_recognition.compare_faces(face, temp_encode))
+    encodings_numpy = np.array(known_encodings)
+    encodings = face_recognition.compare_faces(encodings_numpy, temp_encode)
+
+    return encodings, known_names, small_frame
 
 
 
-    person_name = "Unknown"
-    data = None
-    for entry in encodings:
-        if True in entry[:len(entry)]:
-            match_index = encodings.index(entry)
-            person_name = known_names[match_index]
-            path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
-            image = open(path, "rb")
-            image_encoded = base64.b64encode(image.read())
-            image_encoded = image_encoded.decode('utf-8')
-            add_to_known_stream(person_name, image_encoded)
-            generate_json(person_name)
-            image.close()
-        else:
-            path = add_unknown_image(small_frame)
-            unknown_image = open(path, "rb")
-            unknown = base64.b64encode(unknown_image.read())
-            unknown = unknown.decode('utf-8')
-            add_to_unknown_stream(unknown)
-            generate_json(person_name)
+'''
+Main script function
+'''
+def main():
+    video_capture = get_camera_ip_from_file("camera_ip.txt")
+
+    while True:
+
+        encodings, known_names, small_frame = process_video_to_encode(video_capture, "images/employees")
+        person_name = "Unknown"
+
+        for entry in encodings:
+            if True in entry[:len(entry)]:
+                match_index = encodings.index(entry)
+                person_name = known_names[match_index]
+                path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
+                image = open(path, "rb")
+                image_encoded = base64.b64encode(image.read())
+                image_encoded = image_encoded.decode('utf-8')
+                add_to_known_stream(person_name, image_encoded)
+                generate_json(person_name)
+                image.close()
+            else:
+                path = add_unknown_image(small_frame)
+                unknown_image = open(path, "rb")
+                unknown = base64.b64encode(unknown_image.read())
+                unknown = unknown.decode('utf-8')
+                add_to_unknown_stream(unknown)
+                generate_json(person_name)
+
+
+if __name__== "__main__":
+    main()
