@@ -12,13 +12,14 @@ from random import seed
 import random as rand
 import base64
 
-
 from FacialRecog import *
 
 '''
 Function to add unknown images to the database of images
 Returns image path
 '''
+
+
 def add_unknown_image(img):
     seed(time.time())
     image_counter = rand.randrange(int(time.time()))
@@ -54,11 +55,10 @@ def process_video_to_encode(video_feed, images_directory, temp_filename="images/
     temp = face_recognition.load_image_file(temp_filename)
     temp_encode = face_recognition.face_encodings(temp)
 
-    encodings = []
-    for face in known_encodings:
-        encodings += face_recognition.compare_faces(temp_encode, face)
+    encodings_numpy = np.array(known_encodings)
+    encodings = face_recognition.compare_faces(encodings_numpy, temp_encode)
 
-    return encodings
+    return encodings, known_names, small_frame
 
 
 
@@ -70,28 +70,27 @@ def main():
 
     while True:
 
-        encodings = process_video_to_encode(video_capture, "images/employees")
-        known_face_names = ["Ryan Goluch"]
+        encodings, known_names, small_frame = process_video_to_encode(video_capture, "images/employees")
         person_name = "Unknown"
-        data = None
 
-        if True in encodings:
-            first_match_index = encodings.index(True)
-            person_name = known_face_names[first_match_index]
-            path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
-            image = open(path, "rb")
-            image_encoded = base64.b64encode(image.read())
-            # print(image_encoded)
-            add_to_known_stream(person_name, image_encoded)
-            generate_json(person_name)
-            image.close()
-        elif False in encodings:
-            path = "images/temp.jpeg"
-            image = cv2.imread(path)
-            path = add_unknown_image(image)
-            unknown = base64.b64encode(image)
-            add_to_unknown_stream(unknown)
-            generate_json(person_name)
+        for entry in encodings:
+            if True in entry[:len(entry)]:
+                match_index = encodings.index(entry)
+                person_name = known_names[match_index]
+                path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
+                image = open(path, "rb")
+                image_encoded = base64.b64encode(image.read())
+                image_encoded = image_encoded.decode('utf-8')
+                add_to_known_stream(person_name, image_encoded)
+                generate_json(person_name)
+                image.close()
+            else:
+                path = add_unknown_image(small_frame)
+                unknown_image = open(path, "rb")
+                unknown = base64.b64encode(unknown_image.read())
+                unknown = unknown.decode('utf-8')
+                add_to_unknown_stream(unknown)
+                generate_json(person_name)
 
 
 if __name__== "__main__":

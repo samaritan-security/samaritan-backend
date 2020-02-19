@@ -63,9 +63,9 @@ def scan_for_known_people(known_people_folder):
         print("DEBUG: Attempted to load image file from", file)
         image = face_recognition.load_image_file(file)
 
-        if os.path.isfile(os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"):
+        if os.path.isfile(os.path.join(known_people_folder, "PreEncoded"+filename) + ".npy"):
             # read from file, for performance reasons. useful for large batches of files
-            encodedfile = np.load((os.path.join(known_people_folder, "PreEncoded", filename) + ".npy"))
+            encodedfile = np.load((os.path.join(known_people_folder, "PreEncoded"+filename) + ".npy"))
 
             if encodedfile is not None:
                 names.append(filename)
@@ -85,7 +85,7 @@ def scan_for_known_people(known_people_folder):
                 face_encodings.append(single_encoding[0])
 
                 # write to file, for performance reasons, so as to not calculate all the faces each time
-                encodedfile = np.save((os.path.join(known_people_folder, filename) + ".npy"), single_encoding[0])
+                encodedfile = np.save((os.path.join(known_people_folder, "PreEncoded"+filename) + ".npy"), single_encoding[0])
                 print("DEBUG: saved to document", filename)
                 print("DEBUG: saved to document", encodedfile)
 

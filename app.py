@@ -70,7 +70,6 @@ def get_all_users():
     for document in cursor:
         document['_id'] = str(document['_id'])
         entries.append(document)
-
     return json.dumps(entries)
 
 
@@ -103,7 +102,15 @@ def add_known_to_stream(*args):
         "name": name,
         "img": img
     }
-    result = db.known.insert_one(known)
+    # result = db.known.insert_one(known)
+    result = db.known.update_one({
+        'name': known['name']
+    }, {
+        '$set': {
+            'name': known['name'],
+            'img': known['img']
+        }
+    }, upsert=True)
     if flag:
         if result is not None:
             return "Success"
@@ -120,6 +127,7 @@ def get_all_known():
     cursor = db.known.find({})
     for document in cursor:
         document['_id'] = str(document['_id'])
+        document['img'] = str(document['img'])
         entries.append(document)
 
     response = jsonify(entries)
@@ -145,7 +153,14 @@ def add_unknown_to_stream(*args):
     known = {
         "img": img
     }
-    result = db.unknown.insert_one(known)
+    # result = db.unknown.insert_one(known)
+    result = db.unknown.update_one({
+        'img': known['img']
+    }, {
+        '$set': {
+            'img': known['img']
+        }
+    }, upsert=True)
     if flag:
         if result is not None:
             return "Success"
@@ -162,12 +177,27 @@ def get_all_unknown():
     cursor = db.unknown.find({})
     for document in cursor:
         document['_id'] = str(document['_id'])
+        document['img'] = str(document['img'])
         entries.append(document)
 
     response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
+
+
+"""
+route to delete all known and unknown until we 
+figure it out
+
+TODO: remove this when stuff is good
+"""
+@app.route('/test', methods=['DELETE'])
+def delete_all_known_unknown():
+    db.unknown.remove({})
+    db.known.remove({})
+
+    return make_response()
 
 
 """
