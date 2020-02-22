@@ -246,6 +246,8 @@ def get_all_unauthorized():
 
 
 """
+checks if a ref_id exists in the unauthorized db.
+returns True if exists, False otherwise
 """
 @app.route('/unauthorized/<ref_id>', methods=['GET'])
 def check_for_unauthorized(ref_id : str):
@@ -256,6 +258,28 @@ def check_for_unauthorized(ref_id : str):
     else:
         response = True
     return json.dumps(response)
+
+
+"""
+removes ref_id from authorized db
+"""
+@app.route('/authorized/<ref_id>', methods=['DELETE'])
+def remove_from_authorized(ref_id : str):
+    result = db.authorized.remove({"ref_id" : ref_id})
+    response = jsonify(result)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+"""
+removed given ref_id from unauthorized db
+"""
+@app.route('/unauthorized/<ref_id>', methods=['DELETE'])
+def remove_from_unauthorized(ref_id : str):
+    result = db.unauthorized.remove({"ref_id" : ref_id})
+    response = jsonify(result)
+    response.headers.add('Acess-Control-Allow-Origin', '*')
+    return response
+
 
 """
 route to delete all known and unknown until we 
