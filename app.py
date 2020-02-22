@@ -8,8 +8,7 @@ from bson.objectid import ObjectId
 from mongoengine import connect
 
 app = Flask(__name__)
-client: MongoClient = MongoClient(
-    "localhost:27017")
+client: MongoClient = MongoClient("localhost:27017")
 
 db = client.user  # need for non graphql routes that access db
 
@@ -189,41 +188,41 @@ def get_all_unknown():
 """
 adds to authorized
 """
-@app.route('/authorized', methods=[POST])
+@app.route('/authorized', methods=['POST'])
 def add_authorized():
     data = request.get_json("data")
-    _id = data["_id"]
+    ref_id = data["ref_id"]
     authorized = {
-        "ref_id": _id
+        "ref_id": ref_id
     }
     result = db.authorized.insert_one(authorized)
-    return make_response(result)
+    return make_response()
 
 
 """
 adds to unauthorized
 """
-@app.route('/unauthorized', methods=[POST])
+@app.route('/unauthorized', methods=['POST'])
 def add_unauthorized():
     data = request.get_json("data")
-    _id = data["_id"]
+    ref_id = data["ref_id"]
     unauthorized = {
-        "ref_id": _id
+        "ref_id": ref_id
     }
     result = db.unauthorized.insert_one(unauthorized)
-    return make_response(result)
+    return make_response()
 
 
 """
 returns all authorized user ref_ids
 (reF_id referes to the user's id in known or unknown)
 """
-@app.route('/authorized', methods=[GET])
+@app.route('/authorized', methods=['GET'])
 def get_all_authorized():
     entries = []
     cursor = db.authorized.find({})
     for document in cursor:
-        document["_id"] = str(document["id"])
+        document["_id"] = str(document["_id"])
         entries.append(document)
     response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
@@ -233,7 +232,7 @@ def get_all_authorized():
 returns all unauthorized user ref-ids
 (ref_id refers to the user's id in known or unknown)
 """
-@app.route('/unauthorized', methods=[GET])
+@app.route('/unauthorized', methods=['GET'])
 def get_all_unauthorized():
     entries = []
     cursor = db.unauthorized.find({})
@@ -254,6 +253,8 @@ TODO: remove this when stuff is good
 def delete_all_known_unknown():
     db.unknown.remove({})
     db.known.remove({})
+    db.authorized.remove({})
+    db.unauthorized.remove({})
 
     return make_response()
 
