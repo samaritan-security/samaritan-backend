@@ -91,7 +91,7 @@ known people in the camera feed.
 @app.route('/known', methods=['POST'])
 def add_known_to_stream(*args):
     flag = False
-    if args is not None:
+    if len(args) != 0:
         data = args[0]
         flag = True
     else:
@@ -144,7 +144,7 @@ unknown people in the camera feed.
 @app.route('/unknown', methods=['POST'])
 def add_unknown_to_stream(*args):
     flag = False
-    if args is not None:
+    if len(args) != 0:
         data = args[0]
         flag = True
     else:

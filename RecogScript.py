@@ -55,24 +55,24 @@ def process_video_to_encode(video_feed, images_directory, temp_filename="images/
     temp = face_recognition.load_image_file(temp_filename)
     temp_encode = face_recognition.face_encodings(temp)
 
-    encodings_numpy = np.array(known_encodings)
-    encodings = face_recognition.compare_faces(encodings_numpy, temp_encode)
+    # ryan look hereee...
+    if len(temp_encode) == 0:
+        return None, known_names, small_frame
+
+    encodings = []
+    for face in known_encodings:
+        if len(temp_encode) == 1:
+            temp = [face_recognition.compare_faces(face, temp_encode)]
+            encodings.append(temp)
+        else:
+            encodings.append(face_recognition.compare_faces(face, temp_encode))
 
     return encodings, known_names, small_frame
 
 
-
-'''
-Main script function
-'''
-def main():
-    video_capture = get_camera_ip_from_file("camera_ip.txt")
-
-    while True:
-
-        encodings, known_names, small_frame = process_video_to_encode(video_capture, "images/employees")
-        person_name = "Unknown"
-
+def check_encodings(encodings, known_names, small_frame):
+    if encodings is not None:
+        person_name = "unknown"
         for entry in encodings:
             if True in entry[:len(entry)]:
                 match_index = encodings.index(entry)
@@ -91,6 +91,18 @@ def main():
                 unknown = unknown.decode('utf-8')
                 add_to_unknown_stream(unknown)
                 generate_json(person_name)
+
+'''
+Main script function
+'''
+def main():
+    video_capture = get_camera_ip_from_file("camera_ip.txt")
+
+    while True:
+        encodings, known_names, small_frame = process_video_to_encode(video_capture, "images/employees")
+        check_encodings(encodings, known_names, small_frame)
+
+
 
 
 if __name__== "__main__":
