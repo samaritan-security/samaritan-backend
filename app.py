@@ -187,30 +187,50 @@ def get_all_unknown():
 
 """
 adds to authorized
+returns 200 if added, 500 if duplicate id
 """
 @app.route('/authorized', methods=['POST'])
 def add_authorized():
     data = request.get_json("data")
     ref_id = data["ref_id"]
     authorized = {
-        "ref_id": ref_id
+        "_id": ref_id
     }
-    result = db.authorized.insert_one(authorized)
-    return make_response()
+    try:
+        result = db.authorized.insert_one(authorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype='application/json'
+        )
+    return app.response_class(
+        status=200,
+        mimetype='application/json'
+    )
 
 
 """
 adds to unauthorized
+returns 200 if added, 500 if duplicate id
 """
 @app.route('/unauthorized', methods=['POST'])
 def add_unauthorized():
     data = request.get_json("data")
     ref_id = data["ref_id"]
     unauthorized = {
-        "ref_id": ref_id
+        "_id": ref_id
     }
-    result = db.unauthorized.insert_one(unauthorized)
-    return make_response()
+    try:
+        result = db.unauthorized.insert_one(unauthorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype='application/json'
+        )
+    return app.response_class(
+        status=200,
+        mimetype='application/json'
+    )
 
 
 """
@@ -251,13 +271,17 @@ returns True if exists, False otherwise
 """
 @app.route('/unauthorized/<ref_id>', methods=['GET'])
 def check_for_unauthorized(ref_id : str):
-    result = db.unauthorized.find({"ref_id": ref_id})
+    result = db.unauthorized.find({"_id": ref_id})
     result_count = result.count()
     if result_count < 1:
         response = False
     else:
         response = True
-    return json.dumps(response)
+    return app.response_class(
+        response=json.dumps(response),
+        status=200,
+        mimetype='application/json'
+    )
 
 
 """
@@ -269,6 +293,7 @@ def remove_from_authorized(ref_id : str):
     response = jsonify(result)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
 
 """
 removed given ref_id from unauthorized db
