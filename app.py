@@ -228,6 +228,7 @@ def get_all_authorized():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+
 """
 returns all unauthorized user ref-ids
 (ref_id refers to the user's id in known or unknown)
@@ -242,6 +243,19 @@ def get_all_unauthorized():
     response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
+
+"""
+"""
+@app.route('/unauthorized/<ref_id>', methods=['GET'])
+def check_for_unauthorized(ref_id : str):
+    result = db.unauthorized.find({"ref_id": ref_id})
+    result_count = result.count()
+    if result_count < 1:
+        response = False
+    else:
+        response = True
+    return json.dumps(response)
 
 """
 route to delete all known and unknown until we 
