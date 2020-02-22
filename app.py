@@ -187,6 +187,64 @@ def get_all_unknown():
 
 
 """
+adds to authorized
+"""
+@app.route('/authorized', methods=[POST])
+def add_authorized():
+    data = request.get_json("data")
+    _id = data["_id"]
+    authorized = {
+        "ref_id": _id
+    }
+    result = db.authorized.insert_one(authorized)
+    return make_response(result)
+
+
+"""
+adds to unauthorized
+"""
+@app.route('/unauthorized', methods=[POST])
+def add_unauthorized():
+    data = request.get_json("data")
+    _id = data["_id"]
+    unauthorized = {
+        "ref_id": _id
+    }
+    result = db.unauthorized.insert_one(unauthorized)
+    return make_response(result)
+
+
+"""
+returns all authorized user ref_ids
+(reF_id referes to the user's id in known or unknown)
+"""
+@app.route('/authorized', methods=[GET])
+def get_all_authorized():
+    entries = []
+    cursor = db.authorized.find({})
+    for document in cursor:
+        document["_id"] = str(document["id"])
+        entries.append(document)
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+"""
+returns all unauthorized user ref-ids
+(ref_id refers to the user's id in known or unknown)
+"""
+@app.route('/unauthorized', methods=[GET])
+def get_all_unauthorized():
+    entries = []
+    cursor = db.unauthorized.find({})
+    for document in cursor:
+        document["_id"] = str(document["_id"])
+        entries.append(document)
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+"""
 route to delete all known and unknown until we 
 figure it out
 
