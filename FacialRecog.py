@@ -99,25 +99,25 @@ def scan_for_known_people(known_people_folder):
 
     return names, face_encodings
 
-
-# TODO: STILL WORKING ON
-def scan_for_known_people_from_db(encoded_encoding: str):
-    names = []
-    face_encodings = []
+"""
+Gets data from KNOWN db and detects if facial encodings are the same
+"""
+def scan_for_known_people_from_db(npy_list: str):
     all_encodings = []
     data = get_all_known("not_api_call")
 
     for i in data:
         # decode b64 np array and save that into a list
-        all_encodings.append(i['npy'])
+        foo = i['npy'].strip('][').split(', ')
+        for j in range(len(foo)):
+            foo[j] = float(foo[j])
+        all_encodings.append(foo)
 
-    all_encodings = [all_encodings]
     all_encodings = np.array(all_encodings)
-    encoded_encoding = np.array(encoded_encoding)
-    detected_faces = face_recognition.compare_faces(all_encodings, encoded_encoding)
-    print("foo")
+    npy_array = np.array(npy_list)
+    detected_faces = face_recognition.compare_faces(all_encodings, npy_array)
 
-    return names, face_encodings
+    return detected_faces
 
 
 '''
