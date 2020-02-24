@@ -1,3 +1,6 @@
+import pickle
+
+import pymongo
 from flask import Flask, render_template, make_response, request, jsonify
 from pymongo import MongoClient
 import json
@@ -27,59 +30,54 @@ def index():
 
 """
 adds new user
-TODO: I don't like how this is done right now even though it works.
+DEPRECATED ATM
 """
-@app.route('/user', methods=['POST'])
-def add_users(*args):
-    flag = False
-    if args is not None:
-        data = args[0]
-        flag = True
-    else:
-        data = request.get_json("data")
-    name = data["name"]
-    image = data["image"]
-    user = {
-        "name": name,
-        "image": image,
-        "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
-    result = db.user.insert_one(user)
-    if flag:
-        if result is not None:
-            return "Success"
-        raise RuntimeError(result)
-    return make_response()
+# @app.route('/user', methods=['POST'])
+# def add_users(*args):
+#     flag = False
+#     if args is not None:
+#         data = args[0]
+#         flag = True
+#     else:
+#         data = request.get_json("data")
+#     name = data["name"]
+#     image = data["image"]
+#     user = {
+#         "name": name,
+#         "image": image,
+#         "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     }
+#     result = db.user.insert_one(user)
+#     if flag:
+#         if result is not None:
+#             return "Success"
+#         raise RuntimeError(result)
+#     return make_response()
 
-
-"""
-removes new user
-"""
-# @app.route('/user', methods=['DELETE'])
-# def user():
-#     # TODO :)
 
 """
 returns all users
+DEPRECATED
 """
-@app.route('/allUsers', methods=['GET'])
-def get_all_users():
-    entries = []
-    cursor = db.user.find({})
-    for document in cursor:
-        document['_id'] = str(document['_id'])
-        entries.append(document)
-    return json.dumps(entries)
+# @app.route('/allUsers', methods=['GET'])
+# def get_all_users():
+#     entries = []
+#     cursor = db.user.find({})
+#     for document in cursor:
+#         document['_id'] = str(document['_id'])
+#         entries.append(document)
+#     return json.dumps(entries)
 
 
 """
 given user_id, returns user
+deprecated
 """
-@app.route('/user/<user_id>', methods=['GET'])
-def get_user_by_id(user_id: str):
-    user = db.user.find_one({"_id": ObjectId(user_id)})
-    user.pop('_id')
-    return json.dumps(user)
+# @app.route('/user/<user_id>', methods=['GET'])
+# def get_user_by_id(user_id: str):
+#     user = db.user.find_one({"_id": ObjectId(user_id)})
+#     user.pop('_id')
+#     return json.dumps(user)
 
 
 """
@@ -97,9 +95,11 @@ def add_known_to_stream(*args):
         data = request.get_json("data")
     img = data['img']
     name = data['name']
+    npy = data['npy']
     known = {
         "name": name,
-        "img": img
+        "img": img,
+        "npy": npy
     }
     # result = db.known.insert_one(known)
     result = db.known.update_one({
@@ -107,7 +107,8 @@ def add_known_to_stream(*args):
     }, {
         '$set': {
             'name': known['name'],
-            'img': known['img']
+            'img': known['img'],
+            'npy': known['npy']
         }
     }, upsert=True)
     if flag:
@@ -121,18 +122,21 @@ def add_known_to_stream(*args):
 returns all known images
 """
 @app.route('/known', methods=['GET'])
-def get_all_known():
+def get_all_known(*args):
+
     entries = []
     cursor = db.known.find({})
     for document in cursor:
         document['_id'] = str(document['_id'])
         document['img'] = str(document['img'])
+        document['npy'] = str(document['npy'])
         entries.append(document)
 
-    response = jsonify(entries)
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
-    return response
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return entries
 
 
 """
@@ -149,15 +153,19 @@ def add_unknown_to_stream(*args):
     else:
         data = request.get_json("data")
     img = data['img']
+    npy = data['npy']
     known = {
-        "img": img
+        "img": img,
+        "npy": npy
     }
     # result = db.unknown.insert_one(known)
     result = db.unknown.update_one({
-        'img': known['img']
+        'img': known['img'],
+        'npy': known['npy']
     }, {
         '$set': {
-            'img': known['img']
+            'img': known['img'],
+            'npy': known['npy']
         }
     }, upsert=True)
     if flag:
@@ -177,6 +185,7 @@ def get_all_unknown():
     for document in cursor:
         document['_id'] = str(document['_id'])
         document['img'] = str(document['img'])
+        document['npy'] = str(document['npy'])
         entries.append(document)
 
     response = jsonify(entries)

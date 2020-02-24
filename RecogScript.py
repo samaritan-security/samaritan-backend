@@ -10,8 +10,6 @@ Author(s): Devin Uner, Ryan Goluch, Ann Gould
 import time
 from random import seed
 import random as rand
-import base64
-
 from FacialRecog import *
 
 '''
