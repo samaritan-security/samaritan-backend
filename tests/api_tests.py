@@ -1,11 +1,6 @@
 import unittest
 import json
-
-from numpy.ma import array
-import numpy as np
-
 from app import app
-import pickle
 
 
 class APITest(unittest.TestCase):
@@ -42,8 +37,6 @@ class APITest(unittest.TestCase):
                                         -0.09417901,  0.10270834,  0.00520589])])
         # self.encoded_encoding = pickle.dumps(self.encoded_encoding)
         self.encoded_encoding = self.encoded_encoding.tolist()
-
-
     # all tests must start with "test"
     def test_index_status_code(self):
         result = self.app.get('/')
@@ -54,7 +47,6 @@ class APITest(unittest.TestCase):
         data = {"name": self.name, "img": self.encoded_image, "npy": self.encoded_encoding}
         result = self.app.post('/known', data=json.dumps(data), content_type="application/json")
         self.assertEqual(result.status_code, 200)
-
 
 
 

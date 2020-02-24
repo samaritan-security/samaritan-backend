@@ -1,6 +1,3 @@
-import pickle
-
-import pymongo
 from flask import Flask, render_template, make_response, request, jsonify
 from pymongo import MongoClient
 import json
