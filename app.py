@@ -8,8 +8,7 @@ from bson.objectid import ObjectId
 from mongoengine import connect
 
 app = Flask(__name__)
-client: MongoClient = MongoClient(
-    "localhost:27017")
+client: MongoClient = MongoClient("localhost:27017")
 
 db = client.user  # need for non graphql routes that access db
 
@@ -187,6 +186,127 @@ def get_all_unknown():
 
 
 """
+adds to authorized
+returns 200 if added, 500 if duplicate id
+"""
+@app.route('/authorized', methods=['POST'])
+def add_authorized():
+    data = request.get_json("data")
+    ref_id = data["ref_id"]
+    authorized = {
+        "_id": ref_id
+    }
+    try:
+        result = db.authorized.insert_one(authorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype='application/json'
+        )
+    return app.response_class(
+        status=200,
+        mimetype='application/json'
+    )
+
+
+"""
+adds to unauthorized
+returns 200 if added, 500 if duplicate id
+"""
+@app.route('/unauthorized', methods=['POST'])
+def add_unauthorized():
+    data = request.get_json("data")
+    ref_id = data["ref_id"]
+    unauthorized = {
+        "_id": ref_id
+    }
+    try:
+        result = db.unauthorized.insert_one(unauthorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype='application/json'
+        )
+    return app.response_class(
+        status=200,
+        mimetype='application/json'
+    )
+
+
+"""
+returns all authorized user ref_ids
+(reF_id referes to the user's id in known or unknown)
+"""
+@app.route('/authorized', methods=['GET'])
+def get_all_authorized():
+    entries = []
+    cursor = db.authorized.find({})
+    for document in cursor:
+        document["_id"] = str(document["_id"])
+        entries.append(document)
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+"""
+returns all unauthorized user ref-ids
+(ref_id refers to the user's id in known or unknown)
+"""
+@app.route('/unauthorized', methods=['GET'])
+def get_all_unauthorized():
+    entries = []
+    cursor = db.unauthorized.find({})
+    for document in cursor:
+        document["_id"] = str(document["_id"])
+        entries.append(document)
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+"""
+checks if a ref_id exists in the unauthorized db.
+returns True if exists, False otherwise
+"""
+@app.route('/unauthorized/<ref_id>', methods=['GET'])
+def check_for_unauthorized(ref_id : str):
+    result = db.unauthorized.find({"_id": ref_id})
+    result_count = result.count()
+    if result_count < 1:
+        response = False
+    else:
+        response = True
+    return app.response_class(
+        response=json.dumps(response),
+        status=200,
+        mimetype='application/json'
+    )
+
+
+"""
+removes ref_id from authorized db
+"""
+@app.route('/authorized/<ref_id>', methods=['DELETE'])
+def remove_from_authorized(ref_id : str):
+    result = db.authorized.remove({"ref_id" : ref_id})
+    response = jsonify(result)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+"""
+removed given ref_id from unauthorized db
+"""
+@app.route('/unauthorized/<ref_id>', methods=['DELETE'])
+def remove_from_unauthorized(ref_id : str):
+    result = db.unauthorized.remove({"ref_id" : ref_id})
+    response = jsonify(result)
+    response.headers.add('Acess-Control-Allow-Origin', '*')
+    return response
+
+
+"""
 route to delete all known and unknown until we 
 figure it out
 
@@ -196,6 +316,8 @@ TODO: remove this when stuff is good
 def delete_all_known_unknown():
     db.unknown.remove({})
     db.known.remove({})
+    db.authorized.remove({})
+    db.unauthorized.remove({})
 
     return make_response()
 
