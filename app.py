@@ -6,6 +6,8 @@ from schema import schema
 import datetime
 from bson.objectid import ObjectId
 from mongoengine import connect
+import dateutil.parser
+import traceback
 
 app = Flask(__name__)
 client: MongoClient = MongoClient("localhost:27017")
@@ -18,33 +20,73 @@ DEFAULT_CONNECTION_NAME = connect('user')  # need this for graphql
 initial endpoint for sample application
 all rendered templates need to be put in a templates folder
 """
-
-
 @app.route('/')
 def index():
     return render_template("index.html")
 
 
 """
-adds new user
-TODO: I don't like how this is done right now even though it works.
+gets all known people
 """
-@app.route('/user', methods=['POST'])
-def add_users(*args):
+@app.route('/people/known', methods=['GET'])
+def get_known_people(*args):
+    entries = []
+    cursor = db.people.find({"known" : True})
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        document['img'] = str(document['img'])
+        document['npy'] = str(document['npy'])
+        entries.append(document)
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return entries
+
+
+"""
+gets all unknown people
+"""
+@app.route('/people/unknown', methods=['GET'])
+def get_unknown_people(*args):
+    entries = []
+    cursor = db.people.find({"known" : False})
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        document['img'] = str(document['img'])
+        document['npy'] = str(document['npy'])
+        entries.append(document)
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return entries
+
+
+"""
+adds new known person
+"""
+@app.route('/people/known', methods=['POST'])
+def add_known_person(*args):
     flag = False
-    if args is not None:
+    if len(args) != 0:
         data = args[0]
         flag = True
     else:
         data = request.get_json("data")
+    img = data["img"]
+    npy = data["npy"]
     name = data["name"]
-    image = data["image"]
-    user = {
-        "name": name,
-        "image": image,
-        "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    known = True
+    person = {
+        "known" : known,
+        "name" : name,
+        "img" : img,
+        "npy" : npy
     }
-    result = db.user.insert_one(user)
+    result = db.people.insert_one(person)
     if flag:
         if result is not None:
             return "Success"
@@ -53,42 +95,10 @@ def add_users(*args):
 
 
 """
-removes new user
+adds new unknown person
 """
-# @app.route('/user', methods=['DELETE'])
-# def user():
-#     # TODO :)
-
-"""
-returns all users
-"""
-@app.route('/allUsers', methods=['GET'])
-def get_all_users():
-    entries = []
-    cursor = db.user.find({})
-    for document in cursor:
-        document['_id'] = str(document['_id'])
-        entries.append(document)
-    return json.dumps(entries)
-
-
-"""
-given user_id, returns user
-"""
-@app.route('/user/<user_id>', methods=['GET'])
-def get_user_by_id(user_id: str):
-    user = db.user.find_one({"_id": ObjectId(user_id)})
-    user.pop('_id')
-    return json.dumps(user)
-
-
-"""
-adds new known name and image to stream.
-the stream represents the current
-known people in the camera feed.
-"""
-@app.route('/known', methods=['POST'])
-def add_known_to_stream(*args):
+@app.route('/people/unknown', methods=['POST'])
+def add_unknown_person(*args):
     flag = False
     if len(args) != 0:
         data = args[0]
@@ -96,20 +106,14 @@ def add_known_to_stream(*args):
     else:
         data = request.get_json("data")
     img = data['img']
-    name = data['name']
-    known = {
-        "name": name,
-        "img": img
+    npy = data['npy']
+    known = False
+    person = {
+        "known" : known,
+        "img" : img,
+        "npy" : npy
     }
-    # result = db.known.insert_one(known)
-    result = db.known.update_one({
-        'name': known['name']
-    }, {
-        '$set': {
-            'name': known['name'],
-            'img': known['img']
-        }
-    }, upsert=True)
+    result = db.people.insert_one(person)
     if flag:
         if result is not None:
             return "Success"
@@ -117,16 +121,27 @@ def add_known_to_stream(*args):
     return make_response()
 
 
+
 """
-returns all known images
+returns all instances of seen from s_time -> f_time
 """
-@app.route('/known', methods=['GET'])
-def get_all_known():
+@app.route('/seen/<s_time>/<f_time>', methods=['GET'])
+def get_seen_time_interval(s_time : str, f_time: str):
+    s_time = s_time.replace("%", " ")
+    f_time = f_time.replace("%", " ")
+
+    start_time = dateutil.parser.parse(s_time)
+    end_time = dateutil.parser.parse(f_time)
+
     entries = []
-    cursor = db.known.find({})
+    cursor = db.seen.find({
+        "created_at" : {
+            "$gte" : start_time,
+            "$lte" : end_time
+        }})
+        
     for document in cursor:
         document['_id'] = str(document['_id'])
-        document['img'] = str(document['img'])
         entries.append(document)
 
     response = jsonify(entries)
@@ -136,47 +151,28 @@ def get_all_known():
 
 
 """
-adds new unknown image to stream.
-the stream represents the current
-unknown people in the camera feed.
+add new instance of person seen
 """
-@app.route('/unknown', methods=['POST'])
-def add_unknown_to_stream(*args):
-    flag = False
-    if len(args) != 0:
-        data = args[0]
-        flag = True
-    else:
-        data = request.get_json("data")
-    img = data['img']
-    known = {
-        "img": img
+@app.route('/seen/<ref_id>', methods=['PUT'])
+def add_new_seen(ref_id):
+    time = datetime.datetime.now()
+    seen = {
+        "ref_id": ref_id,
+        "created_at": time
     }
-    # result = db.unknown.insert_one(known)
-    result = db.unknown.update_one({
-        'img': known['img']
-    }, {
-        '$set': {
-            'img': known['img']
-        }
-    }, upsert=True)
-    if flag:
-        if result is not None:
-            return "Success"
-        raise RuntimeError(result)
+    result = db.seen.insert_one(seen)
     return make_response()
 
 
 """
-returns all unknown images
+returns all in seen
 """
-@app.route('/unknown', methods=['GET'])
-def get_all_unknown():
+@app.route('/seen', methods=['GET'])
+def get_all_seen():
     entries = []
-    cursor = db.unknown.find({})
+    cursor = db.seen.find({})
     for document in cursor:
         document['_id'] = str(document['_id'])
-        document['img'] = str(document['img'])
         entries.append(document)
 
     response = jsonify(entries)
@@ -210,6 +206,34 @@ def add_authorized():
 
 
 """
+removes given ref_id from authorized db
+returns true if item deleted, false otherwise
+"""
+@app.route('/authorized/<ref_id>', methods=['DELETE'])
+def remove_from_authorized(ref_id):
+    result = db.authorized.delete_one({"_id" : ref_id})
+    response = jsonify(result.deleted_count == 1)
+    response.headers.add('Acess-Control-Allow-Origin', '*')
+    return response
+
+
+"""
+returns all authorized user ref_ids
+(ref_id refers to the user's id in known or unknown)
+"""
+@app.route('/authorized', methods=['GET'])
+def get_all_authorized():
+    entries = []
+    cursor = db.authorized.find({})
+    for document in cursor:
+        document["_id"] = str(document["_id"])
+        entries.append(document)
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+"""
 adds to unauthorized
 returns 200 if added, 500 if duplicate id
 """
@@ -234,18 +258,13 @@ def add_unauthorized():
 
 
 """
-returns all authorized user ref_ids
-(reF_id referes to the user's id in known or unknown)
+removes given ref_id from unauthorized db
 """
-@app.route('/authorized', methods=['GET'])
-def get_all_authorized():
-    entries = []
-    cursor = db.authorized.find({})
-    for document in cursor:
-        document["_id"] = str(document["_id"])
-        entries.append(document)
-    response = jsonify(entries)
-    response.headers.add('Access-Control-Allow-Origin', '*')
+@app.route('/unauthorized/<ref_id>', methods=['DELETE'])
+def remove_from_unauthorized(ref_id):
+    result = db.unauthorized.delete_one({"_id" : ref_id})
+    response = jsonify(result.deleted_count == 1)
+    response.headers.add('Acess-Control-Allow-Origin', '*')
     return response
 
 
@@ -263,6 +282,7 @@ def get_all_unauthorized():
     response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
 
 
 """
@@ -285,24 +305,61 @@ def check_for_unauthorized(ref_id : str):
 
 
 """
-removes ref_id from authorized db
+returns all alerts instances from s_time => f_time
 """
-@app.route('/authorized/<ref_id>', methods=['DELETE'])
-def remove_from_authorized(ref_id : str):
-    result = db.authorized.remove({"ref_id" : ref_id})
-    response = jsonify(result)
+@app.route('/alerts/<s_time>/<f_time>', methods=['GET'])
+def get_alerts_time_intervale(s_time, f_time):
+    s_time = s_time.replace("%", " ")
+    f_time = f_time.replace("%", " ")
+
+    start_time = dateutil.parser.parse(s_time)
+    end_time = dateutil.parser.parse(f_time)
+
+    entries = []
+    cursor = db.alerts.find({
+        "created_at" : {
+            "$gte" : start_time,
+            "$lte" : end_time
+        }})
+        
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        entries.append(document)
+
+    response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
+
     return response
 
 
 """
-removed given ref_id from unauthorized db
+adds new alert
 """
-@app.route('/unauthorized/<ref_id>', methods=['DELETE'])
-def remove_from_unauthorized(ref_id : str):
-    result = db.unauthorized.remove({"ref_id" : ref_id})
-    response = jsonify(result)
-    response.headers.add('Acess-Control-Allow-Origin', '*')
+@app.route('/alerts/<ref_id>', methods=['PUT'])
+def add_new_alert(ref_id):
+    time = datetime.datetime.utcnow()
+    alert = {
+        "ref_id": ref_id,
+        "created_at": time
+    }
+    result = db.alerts.insert_one(alert)
+    return make_response()
+
+
+"""
+returns all alerts
+"""
+@app.route('/alerts', methods=['GET'])
+def get_all_alerts():
+    entries = []
+    cursor = db.alerts.find({})
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
     return response
 
 
@@ -314,10 +371,9 @@ TODO: remove this when stuff is good
 """
 @app.route('/test', methods=['DELETE'])
 def delete_all_known_unknown():
-    db.unknown.remove({})
-    db.known.remove({})
     db.authorized.remove({})
     db.unauthorized.remove({})
+    db.seen.remove({})
 
     return make_response()
 
