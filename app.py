@@ -6,6 +6,7 @@ from schema import schema
 import datetime
 from bson.objectid import ObjectId
 from mongoengine import connect
+import dateutil.parser
 
 app = Flask(__name__)
 client: MongoClient = MongoClient("localhost:27017")
@@ -27,7 +28,7 @@ def index():
 gets all known people
 """
 @app.route('/people/known', methods=['GET'])
-def get_known_people():
+def get_known_people(*args):
     entries = []
     cursor = db.people.find({"known" : True})
     for document in cursor:
@@ -36,17 +37,18 @@ def get_known_people():
         document['npy'] = str(document['npy'])
         entries.append(document)
 
-    response = jsonify(entries)
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
-    return response
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return entries
 
 
 """
 gets all unknown people
 """
 @app.route('/people/unknown', methods=['GET'])
-def get_unknown_people():
+def get_unknown_people(*args):
     entries = []
     cursor = db.people.find({"known" : False})
     for document in cursor:
@@ -55,10 +57,11 @@ def get_unknown_people():
         document['npy'] = str(document['npy'])
         entries.append(document)
 
-    response = jsonify(entries)
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
-    return response
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return entries
 
 
 """
@@ -118,39 +121,32 @@ def add_unknown_person(*args):
 
 
 
-# """
-# returns all instances of seen from s_time -> f_time
-# """
-# @app.route('/seen/<s_time>/<f_time>', methods=['GET'])
-# def get_seen_time_interval(s_time : str, f_time : str):
-#     s_time = s_time.replace("%", "-").replace(",","")
-#     f_time = f_time.replace("%", "-").replace(",","")
-    
+"""
+returns all instances of seen from s_time -> f_time
+"""
+@app.route('/seen/<s_time>/<f_time>', methods=['GET'])
+def get_seen_time_interval(s_time : str, f_time: str):
+    s_time = s_time.replace("%", " ")
+    f_time = f_time.replace("%", " ")
 
-#     print(s_time)
-#     print(f_time)
+    start_time = dateutil.parser.parse(s_time)
+    end_time = dateutil.parser.parse(f_time)
 
-#     start = datetime.datetime.strptime(s_time, '%a-%d-%b-%Y-%X-%Z')
-#     end = datetime.datetime.strptime(f_time, '%a-%d-%b-%Y-%X-%Z')
-
-#     entries = []
-
-#     cursor = db.seen.find({
-#         "created_at" : {
-#             "$gte" : start,
-#             "$lt" : end
-#         }})
+    entries = []
+    cursor = db.seen.find({
+        "created_at" : {
+            "$gte" : start_time,
+            "$lte" : end_time
+        }})
         
-#     for document in cursor:
-#         document['_id'] = str(document['_id'])
-#         document['img'] = str(document['img'])
-#         document['npy'] = str(document['npy'])
-#         entries.append(document)
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        entries.append(document)
 
-#     response = jsonify(entries)
-#     response.headers.add('Access-Control-Allow-Origin', '*')
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
 
-#     return response
+    return response
 
 
 """
@@ -166,6 +162,10 @@ def add_new_seen(ref_id):
     result = db.seen.insert_one(seen)
     return make_response()
 
+
+"""
+returns all in seen
+"""
 @app.route('/seen', methods=['GET'])
 def get_all_seen():
     entries = []
@@ -301,29 +301,45 @@ def check_for_unauthorized(ref_id : str):
     )
 
 
-# """
-# returns all alerts instances from s_time => f_time
-# """
-# @app.route('/alerts/<s_time>/<f_time>', methods=['GET'])
-# def get_alerts_time_intervale(s_time, f_time):
-#     result = db.alerts.find({
-#         "created_at" : {
-#             $gte : s_time,
-#             $lt : f_time
-#         }})
-#     return result
+"""
+returns all alerts instances from s_time => f_time
+"""
+@app.route('/alerts/<s_time>/<f_time>', methods=['GET'])
+def get_alerts_time_intervale(s_time, f_time):
+    s_time = s_time.replace("%", " ")
+    f_time = f_time.replace("%", " ")
+
+    start_time = dateutil.parser.parse(s_time)
+    end_time = dateutil.parser.parse(f_time)
+
+    entries = []
+    cursor = db.alerts.find({
+        "created_at" : {
+            "$gte" : start_time,
+            "$lte" : end_time
+        }})
+        
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
 
 
 """
 adds new alert
 """
+@app.route('/alerts/<ref_id>', methods=['PUT'])
 def add_new_alert(ref_id):
     time = datetime.datetime.utcnow()
     alert = {
-        "_id": ref_id,
+        "ref_id": ref_id,
         "created_at": time
     }
-    result = db.alerts.insert_one(seen)
+    result = db.alerts.insert_one(alert)
     return make_response()
 
 
