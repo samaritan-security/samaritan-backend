@@ -7,7 +7,7 @@ Iowa State University
 Author(s): Kate Brune
 '''
 
-from app import check_for_unauthorized
+from app import check_for_unauthorized, add_new_alert
 
 
 def check_for_alert(id : str):
@@ -15,4 +15,4 @@ def check_for_alert(id : str):
         alert(id)
 
 def alert(id : str):
-    # add new alert
+    add_new_alert(id)
