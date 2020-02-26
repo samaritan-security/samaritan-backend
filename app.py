@@ -45,7 +45,6 @@ def get_known_people(*args):
     return entries
 
 
-
 """
 gets all unknown people
 """
@@ -145,11 +144,15 @@ def get_seen_time_interval(s_time : str, f_time: str):
         document['_id'] = str(document['_id'])
         entries.append(document)
 
-    response = jsonify(entries)    
+    response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
-        
+
     return response
 
+
+"""
+add new instance of person seen
+"""
 @app.route('/seen/<ref_id>', methods=['PUT'])
 def add_new_seen(ref_id):
     time = datetime.datetime.now()
