@@ -9,6 +9,8 @@ Author(s): Devin Uner, Ryan Goluch, Ann Gould
 '''
 
 import re
+from typing import Tuple
+
 import face_recognition
 import cv2
 import os
@@ -100,22 +102,19 @@ def scan_for_known_people(known_people_folder):
     return names, face_encodings
 
 """
-Gets data from KNOWN db and detects if facial encodings are the same
+Gets data from a specified db and detects if facial encodings are the same
+returns a dict of users + respective true/false if person was detected
 """
-def scan_for_known_people_from_db(npy_list: str):
-    all_encodings = []
-    data = get_all_known("not_api_call")
+def scan_for_known_people_from_db(npy_known: str) -> dict:
 
-    for i in data:
-        # decode b64 np array and save that into a list
-        foo = i['npy'].strip('][').split(', ')
-        for j in range(len(foo)):
-            foo[j] = float(foo[j])
-        all_encodings.append(foo)
+    all_people, all_encodings = get_names_and_encodings_from_known()
+
 
     all_encodings = np.array(all_encodings)
-    npy_array = np.array(npy_list)
+    npy_array = np.array(npy_known)
     detected_faces = face_recognition.compare_faces(all_encodings, npy_array)
+
+    people_found = dict(zip(all_people, detected_faces))
 
     return detected_faces
 
@@ -123,26 +122,14 @@ def scan_for_known_people_from_db(npy_list: str):
 '''
 Helper function for image pre-processing
 '''
-
-
 def image_files_in_folder(folder):
     # following code snippet from face_recognition
     return [os.path.join(folder, f) for f in os.listdir(folder) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
 
 
 '''
-Function to add the file path of an image to database
-Currently deprecated
-'''
-# def add_facial_data(name: str, image_path: str):
-#     data = {"name": name, "image": image_path}
-#     return add_users(data)
-
-'''
 Updates the known persons in the frame from the facial recog script
 '''
-
-
 def add_to_known_stream(name: str, encoded_image: str, encoded_encoding: str):
     data = {"name": name, "img": encoded_image, "npy": encoded_encoding}
     return add_known_to_stream(data)
@@ -151,15 +138,25 @@ def add_to_known_stream(name: str, encoded_image: str, encoded_encoding: str):
 '''
 Updates the unknown persons in the frame from facial recog script
 '''
-
-
 def add_to_unknown_stream(encoded_image: str):
     data = {"img": encoded_image}
     return add_unknown_to_stream(data)
 
 
-def decode_image(encoded_image: str):
-    imgdata = base64.b64decode(encoded_image)
-    filename = 'some_image.jpg'  # I assume you have a way of picking unique filenames
-    with open(filename, 'wb') as f:
-        f.write(imgdata)
+"""
+Gets names and encodings from KNOWN, puts in lists just like that one function (process video to encode)
+"""
+def get_names_and_encodings_from_known() -> Tuple[list, list]:
+    all_encodings = []
+    all_people = []
+
+    db_get_data = get_all_known("not_api_call")
+    for i in db_get_data:
+        foo = i['npy'].strip('][').split(', ')
+        for j in range(len(foo)):
+            foo[j] = float(foo[j])
+        all_encodings.append(foo)
+        all_people.append(i['name'])
+
+    # returns dictionary of people and their encodings
+    return all_people, all_encodings
