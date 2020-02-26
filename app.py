@@ -7,6 +7,7 @@ import datetime
 from bson.objectid import ObjectId
 from mongoengine import connect
 import dateutil.parser
+import traceback
 
 app = Flask(__name__)
 client: MongoClient = MongoClient("localhost:27017")
@@ -179,6 +180,7 @@ def get_all_seen():
 
     return response
 
+
 """
 adds to authorized
 returns 200 if added, 500 if duplicate id
@@ -205,11 +207,12 @@ def add_authorized():
 
 """
 removes given ref_id from authorized db
+returns true if item deleted, false otherwise
 """
 @app.route('/authorized/<ref_id>', methods=['DELETE'])
 def remove_from_authorized(ref_id):
-    result = db.authorized.remove({"_id" : ref_id})
-    response = jsonify(result)
+    result = db.authorized.delete_one({"_id" : ref_id})
+    response = jsonify(result.deleted_count == 1)
     response.headers.add('Acess-Control-Allow-Origin', '*')
     return response
 
@@ -259,8 +262,8 @@ removes given ref_id from unauthorized db
 """
 @app.route('/unauthorized/<ref_id>', methods=['DELETE'])
 def remove_from_unauthorized(ref_id):
-    result = db.unauthorized.remove({"_id" : ref_id})
-    response = jsonify(result)
+    result = db.unauthorized.delete_one({"_id" : ref_id})
+    response = jsonify(result.deleted_count == 1)
     response.headers.add('Acess-Control-Allow-Origin', '*')
     return response
 
