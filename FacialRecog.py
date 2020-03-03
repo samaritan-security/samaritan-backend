@@ -150,7 +150,7 @@ def get_names_and_encodings_from_known() -> Tuple[list, list]:
     all_encodings = []
     all_people = []
 
-    db_get_data = get_all_known("not_api_call")
+    db_get_data = get_known_people("not_api_call")
     for i in db_get_data:
         foo = i['npy'].strip('][').split(', ')
         for j in range(len(foo)):
