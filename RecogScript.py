@@ -40,7 +40,9 @@ def add_unknown_image(img):
 def process_video_to_encode(video_feed, images_directory, temp_filename="images/temp.jpeg"):
 
     # known_names, known_encodings = scan_for_known_people(images_directory)
-    known_names, known_encodings = get_names_and_encodings_from_known()
+    #known_names, known_encodings = get_names_and_encodings_from_known()
+    all_ids, all_encodings = get_all_people_information()
+
     ret, frame = video_feed.read()
     small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
 
@@ -52,46 +54,66 @@ def process_video_to_encode(video_feed, images_directory, temp_filename="images/
     face_locations = face_recognition.face_locations(rgb_small_frame)
     face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
+    #why do we write this?
+    #can't we do :
+    #temp_encode = face_recognition.face_encodings(small_frame)
     cv2.imwrite(temp_filename, small_frame)
     temp = face_recognition.load_image_file(temp_filename)
     temp_encode = face_recognition.face_encodings(temp)
 
     # ryan look hereee...
     if len(temp_encode) == 0:
-        return None, known_names, small_frame
+        return None, all_ids, small_frame #changed known_names -> all_ids
 
     encodings = []
-    for face in known_encodings:
+    for face in all_encodings: #changed known_encodings -> all_encodings
         if len(temp_encode) == 1:
             temp = [face_recognition.compare_faces(face, temp_encode)]
             encodings.append(temp)
         else:
             encodings.append(face_recognition.compare_faces(face, temp_encode))
 
-    return encodings, known_names, small_frame
+    return encodings, all_ids, small_frame #changed known_names -> all_ids
 
 
-def check_encodings(encodings, known_names, small_frame):
+def check_encodings(encodings, all_ids, small_frame): #changed known_names -> all_ids
     if encodings is not None:
         person_name = "unknown"
         for entry in encodings:
+            # if we know who this is
             if True in entry[:len(entry)]:
                 match_index = encodings.index(entry)
-                person_name = known_names[match_index]
-                path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
-                image = open(path, "rb")
-                image_encoded = base64.b64encode(image.read())
-                image_encoded = image_encoded.decode('utf-8')
-                add_to_known_stream(person_name, image_encoded)
-                generate_json(person_name)
-                image.close()
+
+                #person_name = known_names[match_index]
+                add_new_seen(all_ids[match_index])
+                check_for_alert(all_ids[match_index])
+                
+                # don't think we will need this anymore
+                # path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
+                # image = open(path, "rb")
+                # image_encoded = base64.b64encode(image.read())
+                # image_encoded = image_encoded.decode('utf-8')
+                # add_to_known_stream(person_name, image_encoded)
+                # generate_json(person_name)
+                # image.close()
+
+            # if we don't know who this is, add unknown
             else:
-                path = add_unknown_image(small_frame)
-                unknown_image = open(path, "rb")
-                unknown = base64.b64encode(unknown_image.read())
-                unknown = unknown.decode('utf-8')
-                add_to_unknown_stream(unknown)
-                generate_json(person_name)
+                encoded_image = base64.b64encode(small_frame)
+                encoded_image = encoded_image.decode('utf-8')
+                encoded_encoding = face_recognition.load_image_file(small_frame)
+                encoded_encoding = face_recognition.face_encodings(encoded_encoding)
+                encoded_encoding = str(encoded_encoding)
+                data = {"img": encoded_image, "npy": encoded_encoding}
+                add_unknown_person(data)
+
+                #don't think we need anymore
+                # path = add_unknown_image(small_frame)
+                # unknown_image = open(path, "rb")
+                # unknown = base64.b64encode(unknown_image.read())
+                # unknown = unknown.decode('utf-8')
+                # add_to_unknown_stream(unknown)
+                # generate_json(person_name)
 
 '''
 Main script function

@@ -18,8 +18,8 @@ import numpy as np
 import json
 import base64
 
-from app import add_known_to_stream, add_unknown_to_stream, get_all_known
-
+#from app import add_known_to_stream, add_unknown_to_stream, get_all_known
+from app import get_known_people, get_all_people
 
 def get_video_from_file(filename: str):
     return cv2.VideoCapture(filename)
@@ -152,11 +152,24 @@ def get_names_and_encodings_from_known() -> Tuple[list, list]:
 
     db_get_data = get_known_people("not_api_call")
     for i in db_get_data:
-        foo = i['npy'].strip('][').split(', ')
-        for j in range(len(foo)):
-            foo[j] = float(foo[j])
+        foo = np.fromstring(i['npy'])
         all_encodings.append(foo)
-        all_people.append(i['name'])
+        person = []
+        person = {'name' : i['name'], '_id': i['_id']}
+        all_people.append(person)
 
     # returns dictionary of people and their encodings
     return all_people, all_encodings
+
+def get_all_people_information() -> Tuple[list, list]:
+    all_encodings = []
+    all_ids = []
+
+    db_data = get_all_people("not_api_call")
+    for i in db_data:
+        npy = np.fromstring(i['npy'])
+        all_encodings.append(npy)
+        id = i['_id']
+        all_ids.append(id)
+
+    return all_ids, all_encodings
