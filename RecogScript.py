@@ -39,7 +39,8 @@ def add_unknown_image(img):
 # refactor images directory to be a list of directories probably?
 def process_video_to_encode(video_feed, images_directory, temp_filename="images/temp.jpeg"):
 
-    known_names, known_encodings = scan_for_known_people(images_directory)
+    # known_names, known_encodings = scan_for_known_people(images_directory)
+    known_names, known_encodings = get_names_and_encodings_from_known()
     ret, frame = video_feed.read()
     small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
 
