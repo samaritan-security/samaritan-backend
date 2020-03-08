@@ -16,7 +16,6 @@ import cv2
 import os
 import numpy as np
 import json
-import base64
 
 from app import add_known_to_stream, add_unknown_to_stream, get_all_known
 
