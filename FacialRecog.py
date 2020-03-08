@@ -15,8 +15,8 @@ import face_recognition
 import cv2
 import os
 import numpy as np
-import json
 
+from app import get_known_people, get_all_people
 from app import add_known_person, add_unknown_person, get_known_people
 
 
@@ -32,22 +32,10 @@ def get_camera_ip_from_file(filename: str):
     return video_feed
 
 
-'''
-Function to generate the JSON file for users' data
-'''
-
-
-def generate_json(name: str) -> json:
-    data = {"name": name}
-    print(data)
-    return json.dumps(data)
-
 
 '''
 Function to add a new camera to the text file of camera IPs
 '''
-
-
 def add_camera_ip(ip: str):
     with open("camera_ip.txt", "a") as file:
         num = file.write("\n" + ip)
@@ -56,53 +44,8 @@ def add_camera_ip(ip: str):
         return True
     return False
 
-
-'''
-Function to pre-process the known images to help speed up facial recognition
-'''
-
-
-def scan_for_known_people(known_people_folder):
-    names = []
-    face_encodings = []
-
-    for file in image_files_in_folder(known_people_folder):
-        filename = os.path.splitext(os.path.basename(file))[0]
-        print("DEBUG: Attempted to load image file from", file)
-        image = face_recognition.load_image_file(file)
-
-        if os.path.isfile(os.path.join(known_people_folder, "PreEncoded" + filename) + ".npy"):
-            # read from file, for performance reasons. useful for large batches of files
-            encodedfile = np.load((os.path.join(known_people_folder, "PreEncoded" + filename) + ".npy"))
-
-            if encodedfile is not None:
-                names.append(filename)
-                print("DEBUG: appended from document", filename)
-                face_encodings.append(encodedfile)
-                print("DEBUG: appended from document", encodedfile)
-        else:
-            single_encoding = face_recognition.face_encodings(image)
-
-            if len(single_encoding) > 1:
-                print("WARNING: More than one face found in", file + ".", "Only using the first face.")
-
-            if len(single_encoding) == 0:
-                print("WARNING: No faces found in", file + ".", "Ignoring file.")
-            else:
-                names.append(filename)
-                face_encodings.append(single_encoding[0])
-
-                # write to file, for performance reasons, so as to not calculate all the faces each time
-                encodedfile = np.save((os.path.join(known_people_folder, "PreEncoded" + filename) + ".npy"),
-                                      single_encoding[0])
-                print("DEBUG: saved to document", filename)
-                print("DEBUG: saved to document", encodedfile)
-
-    return names, face_encodings
-
 """
-Gets data from a specified db and detects if facial encodings are the same
-returns a dict of users + respective true/false if person was detected
+gets all encoding/id pairs from people db
 """
 def scan_for_known_people_from_db(npy_known: str) -> dict:
 
@@ -142,20 +85,15 @@ def add_to_unknown_stream(encoded_image: str):
     return add_unknown_person(data)
 
 
-"""
-Gets names and encodings from KNOWN, puts in lists just like that one function (process video to encode)
-"""
-def get_names_and_encodings_from_known() -> Tuple[list, list]:
+def get_all_people_information() -> Tuple[list, list]:
     all_encodings = []
-    all_people = []
+    all_ids = []
 
-    db_get_data = get_known_people("not_api_call")
-    for i in db_get_data:
-        foo = i['npy'].strip('][').split(', ')
-        for j in range(len(foo)):
-            foo[j] = float(foo[j])
-        all_encodings.append(foo)
-        all_people.append(i['name'])
+    db_data = get_all_people("not_api_call")
+    for i in db_data:
+        npy = np.fromstring(i['npy'], count=128)
+        all_encodings.append(npy)
+        id = i['_id']
+        all_ids.append(id)
 
-    # returns dictionary of people and their encodings
-    return all_people, all_encodings
+    return all_ids, all_encodings
