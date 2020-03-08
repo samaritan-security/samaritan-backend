@@ -17,7 +17,7 @@ import os
 import numpy as np
 import json
 
-from app import add_known_to_stream, add_unknown_to_stream, get_all_known
+from app import add_known_person, add_unknown_person, get_known_people
 
 
 def get_video_from_file(filename: str):
@@ -131,7 +131,7 @@ Updates the known persons in the frame from the facial recog script
 '''
 def add_to_known_stream(name: str, encoded_image: str, encoded_encoding: str):
     data = {"name": name, "img": encoded_image, "npy": encoded_encoding}
-    return add_known_to_stream(data)
+    return add_known_person(data)
 
 
 '''
@@ -139,7 +139,7 @@ Updates the unknown persons in the frame from facial recog script
 '''
 def add_to_unknown_stream(encoded_image: str):
     data = {"img": encoded_image}
-    return add_unknown_to_stream(data)
+    return add_unknown_person(data)
 
 
 """
@@ -149,7 +149,7 @@ def get_names_and_encodings_from_known() -> Tuple[list, list]:
     all_encodings = []
     all_people = []
 
-    db_get_data = get_all_known("not_api_call")
+    db_get_data = get_known_people("not_api_call")
     for i in db_get_data:
         foo = i['npy'].strip('][').split(', ')
         for j in range(len(foo)):
