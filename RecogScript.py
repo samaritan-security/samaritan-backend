@@ -13,8 +13,10 @@ import random as rand
 import base64
 import numpy as np
 
+from Alerts import check_for_alert
 from FacialRecog import *
-from app import add_unknown_person
+from app import add_unknown_person, add_new_seen
+
 
 def process_video_to_encode(video_feed, images_directory, temp_filename="images/temp.jpeg"):
 
@@ -46,16 +48,16 @@ def process_video_to_encode(video_feed, images_directory, temp_filename="images/
             temp = [face_recognition.compare_faces(face, temp_encode)]
             encodings.append(temp)
         else:
-            encodings.append(face_recognition.compare_faces(face, temp_encode, tolerance=0.8))
+            encodings.append(face_recognition.compare_faces(face, temp_encode))
 
     return encodings, all_ids, small_frame 
 
 
-def check_encodings(encodings, all_ids, small_frame, temp_filename="images/temp.jpeg"): 
-    if encodings is not None:
-        for entry in encodings:
+def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/temp.jpeg"):
+    if all_encodings is not None:
+        for entry in all_encodings:
             if True in entry[:len(entry)]:
-                match_index = encodings.index(entry)
+                match_index = all_encodings.index(entry)
                 add_new_seen(all_ids[match_index])
                 check_for_alert(all_ids[match_index])
 
@@ -74,12 +76,11 @@ Main script function
 '''
 def main():
     video_capture = get_camera_ip_from_file("camera_ip.txt")
+    unknown_queue = []
 
     while True:
         encodings, all_ids, small_frame = process_video_to_encode(video_capture, "images/employees")
         check_encodings(encodings, all_ids, small_frame)
-
-
 
 
 if __name__== "__main__":

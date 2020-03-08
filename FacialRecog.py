@@ -44,10 +44,11 @@ def add_camera_ip(ip: str):
         return True
     return False
 
-
 """
 gets all encoding/id pairs from people db
 """
+
+
 def get_all_people_information() -> Tuple[list, list]:
     all_encodings = []
     all_ids = []
