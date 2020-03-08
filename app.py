@@ -26,6 +26,25 @@ def index():
 
 
 """
+returns all people
+"""
+@app.route('/people', methods=['GET'])
+def get_all_people(*args):
+    entries = []
+    cursor = db.people.find({})
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        document['img'] = str(document['img'])
+        document['npy'] = str(document['npy'])
+        entries.append(document)
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return entries
+
+"""
 gets all known people
 """
 @app.route('/people/known', methods=['GET'])
@@ -371,6 +390,7 @@ def delete_all_known_unknown():
     db.authorized.remove({})
     db.unauthorized.remove({})
     db.seen.remove({})
+    db.people.remove({})
 
     return make_response()
 

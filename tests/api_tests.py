@@ -16,23 +16,26 @@ class APITest(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-        image = open("temp1.jpeg", "rb")
+        image = open("tests/Ryan_Goluch.jpeg", "rb")
         self.encoded_image = base64.b64encode(image.read())
         self.encoded_image = self.encoded_image.decode('utf-8')
         self.encoded_encoding = face_recognition.load_image_file(image)
         self.encoded_encoding = face_recognition.face_encodings(self.encoded_encoding)
+        self.encoded_encoding = str(self.encoded_encoding)
         image.close()
-        self.name = "Foo Bar"
+        image = open("tests/test2.jpeg", "rb")
+        self.encoded_image_2 = base64.b64encode(image.read())
+        self.encoded_image_2 = self.encoded_image_2.decode('utf-8')
+        self.encoded_encoding_2 = face_recognition.load_image_file(image)
+        self.encoded_encoding_2 = face_recognition.face_encodings(self.encoded_encoding_2)
+        self.encoded_encoding_2 = str(self.encoded_encoding_2)
+        image.close()
+        self.name = "Ryan Goluch"
 
 
     # all tests must start with "test"
     def test_index_status_code(self):
         result = self.app.get('/')
-        self.assertEqual(result.status_code, 200)
-
-    def test_adding_known(self):
-        data = {"name": self.name, "img": self.encoded_image, "npy": self.encoded_encoding}
-        result = self.app.post('/people/known', data=json.dumps(data), content_type="application/json")
         self.assertEqual(result.status_code, 200)
 
     def test_get_known_people(self):
@@ -49,7 +52,7 @@ class APITest(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
 
     def test_add_unknown_person(self):
-        data = {"img": self.encoded_image, "npy": self.encoded_encoding, "name": self.name}
+        data = {"img": self.encoded_image_2, "npy": self.encoded_encoding_2}
         result = self.app.post("/people/unknown", data=json.dumps(data), content_type="application/json")
         self.assertEqual(result.status_code, 200)
     
