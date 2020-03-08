@@ -167,7 +167,7 @@ def get_all_people_information() -> Tuple[list, list]:
 
     db_data = get_all_people("not_api_call")
     for i in db_data:
-        npy = np.fromstring(i['npy'])
+        npy = np.fromstring(i['npy'], count=128)
         all_encodings.append(npy)
         id = i['_id']
         all_ids.append(id)

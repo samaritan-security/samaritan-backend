@@ -11,8 +11,10 @@ import time
 from random import seed
 import random as rand
 import base64
+import numpy as np
 
 from FacialRecog import *
+from app import add_unknown_person
 
 '''
 Function to add unknown images to the database of images
@@ -43,6 +45,7 @@ def process_video_to_encode(video_feed, images_directory, temp_filename="images/
     #known_names, known_encodings = get_names_and_encodings_from_known()
     all_ids, all_encodings = get_all_people_information()
 
+
     ret, frame = video_feed.read()
     small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
 
@@ -61,24 +64,25 @@ def process_video_to_encode(video_feed, images_directory, temp_filename="images/
     temp = face_recognition.load_image_file(temp_filename)
     temp_encode = face_recognition.face_encodings(temp)
 
+
     # ryan look hereee...
     if len(temp_encode) == 0:
         return None, all_ids, small_frame #changed known_names -> all_ids
 
     encodings = []
-    for face in all_encodings: #changed known_encodings -> all_encodings
+    for face in all_encodings: #changed known_encodings -> all_encoding
         if len(temp_encode) == 1:
             temp = [face_recognition.compare_faces(face, temp_encode)]
             encodings.append(temp)
         else:
-            encodings.append(face_recognition.compare_faces(face, temp_encode))
+            encodings.append(face_recognition.compare_faces(face, temp_encode, tolerance=0.8))
 
     return encodings, all_ids, small_frame #changed known_names -> all_ids
 
 
-def check_encodings(encodings, all_ids, small_frame): #changed known_names -> all_ids
+def check_encodings(encodings, all_ids, small_frame, temp_filename="images/temp.jpeg"): #changed known_names -> all_ids
     if encodings is not None:
-        person_name = "unknown"
+        print(encodings)
         for entry in encodings:
             # if we know who this is
             if True in entry[:len(entry)]:
@@ -87,7 +91,7 @@ def check_encodings(encodings, all_ids, small_frame): #changed known_names -> al
                 #person_name = known_names[match_index]
                 add_new_seen(all_ids[match_index])
                 check_for_alert(all_ids[match_index])
-                
+                print(all_ids[match_index])
                 # don't think we will need this anymore
                 # path = "images/employees/" + person_name.replace(" ", "_") + ".jpeg"
                 # image = open(path, "rb")
@@ -99,15 +103,16 @@ def check_encodings(encodings, all_ids, small_frame): #changed known_names -> al
 
             # if we don't know who this is, add unknown
             else:
+
+                cv2.imwrite(temp_filename, small_frame)
                 encoded_image = base64.b64encode(small_frame)
                 encoded_image = encoded_image.decode('utf-8')
-                encoded_encoding = face_recognition.load_image_file(small_frame)
-                encoded_encoding = face_recognition.face_encodings(encoded_encoding)
-                encoded_encoding = str(encoded_encoding)
-                data = {"img": encoded_image, "npy": encoded_encoding}
-                add_unknown_person(data)
+                temp = face_recognition.load_image_file(temp_filename)
+                encoding = face_recognition.face_encodings(temp)
+                encoding = str(encoding)
+                data = {"img": encoded_image, "npy": encoding}
+                #add_unknown_person(data)
 
-                #don't think we need anymore
                 # path = add_unknown_image(small_frame)
                 # unknown_image = open(path, "rb")
                 # unknown = base64.b64encode(unknown_image.read())
@@ -122,8 +127,8 @@ def main():
     video_capture = get_camera_ip_from_file("camera_ip.txt")
 
     while True:
-        encodings, known_names, small_frame = process_video_to_encode(video_capture, "images/employees")
-        check_encodings(encodings, known_names, small_frame)
+        encodings, all_ids, small_frame = process_video_to_encode(video_capture, "images/employees")
+        check_encodings(encodings, all_ids, small_frame)
 
 
 
