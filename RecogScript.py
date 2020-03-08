@@ -70,7 +70,7 @@ def process_video_to_encode(video_feed, images_directory, temp_filename="images/
     return encodings, known_names, small_frame
 
 
-def check_encodings(encodings, known_names, small_frame, que):
+def check_encodings(encodings, known_names, small_frame, queue):
     if encodings is not None:
         person_name = "unknown"
         for entry in encodings:
@@ -85,7 +85,7 @@ def check_encodings(encodings, known_names, small_frame, que):
                 generate_json(person_name)
                 image.close()
             else:
-                if entry not in que:
+                if entry not in queue:
                     path = add_unknown_image(small_frame)
                     unknown_image = open(path, "rb")
                     unknown = base64.b64encode(unknown_image.read())
@@ -93,19 +93,19 @@ def check_encodings(encodings, known_names, small_frame, que):
                     add_to_unknown_stream(unknown)
                     generate_json(person_name)
                 else:
-                    que.append(entry)
-    return que
+                    queue.append(entry)
+    return queue
 
 '''
 Main script function
 '''
 def main():
     video_capture = get_camera_ip_from_file("camera_ip.txt")
-    unknown_que = []
+    unknown_queue = []
 
     while True:
         encodings, known_names, small_frame = process_video_to_encode(video_capture, "images/employees")
-        unknown_que = check_encodings(encodings, known_names, small_frame, unknown_que)
+        unknown_queue = check_encodings(encodings, known_names, small_frame, unknown_queue)
 
 
 
