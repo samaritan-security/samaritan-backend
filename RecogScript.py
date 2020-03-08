@@ -63,13 +63,16 @@ def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/t
 
             else:
                 cv2.imwrite(temp_filename, small_frame)
-                encoded_image = base64.b64encode(small_frame)
-                encoded_image = encoded_image.decode('utf-8')
-                temp = face_recognition.load_image_file(temp_filename)
-                encoding = face_recognition.face_encodings(temp)
-                encoding = str(encoding)
-                data = {"img": encoded_image, "npy": encoding}
-                add_unknown_person(data)
+                image = cv2.imread(temp_filename)
+
+                if(!detect_blurry_image(image)):
+                    encoded_image = base64.b64encode(small_frame)
+                    encoded_image = encoded_image.decode('utf-8')
+                    temp = face_recognition.load_image_file(temp_filename)
+                    encoding = face_recognition.face_encodings(temp)
+                    encoding = str(encoding)
+                    data = {"img": encoded_image, "npy": encoding}
+                    add_unknown_person(data)
 
 '''
 Main script function
