@@ -16,4 +16,13 @@ Welcome to Samaritans Backend <3
 
     - Run with facial_recog.py
     
-    - Uses facial recognition 
+    - Uses facial recognition
+    
+#### Running the API:
+
+Run the following docker commands (need Docker installed):
+```
+docker-compose build
+
+docker-compose up
+```
