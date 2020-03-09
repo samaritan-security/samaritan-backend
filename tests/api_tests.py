@@ -135,6 +135,6 @@ class APITest(unittest.TestCase):
         
     def test_lose_access(self):
         route = self.app.get("/lose")
-        self.assertEqual(result.status_code, 200)
+        self.assertEqual(route.status_code, 200)
 if __name__ == '__main__':
     unittest.main()
