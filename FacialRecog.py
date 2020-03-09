@@ -49,7 +49,7 @@ gets all encoding/id pairs from people db
 """
 def scan_for_known_people_from_db(npy_known: str) -> dict:
 
-    all_people, all_encodings = get_names_and_encodings_from_known()
+    all_people, all_encodings = get_all_people_information()
 
 
     all_encodings = np.array(all_encodings)
