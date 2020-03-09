@@ -16,14 +16,14 @@ class APITest(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-        image = open("tests/Ryan_Goluch.jpeg", "rb")
+        image = open("Ryan_Goluch.jpeg", "rb")
         self.encoded_image = base64.b64encode(image.read())
         self.encoded_image = self.encoded_image.decode('utf-8')
         self.encoded_encoding = face_recognition.load_image_file(image)
         self.encoded_encoding = face_recognition.face_encodings(self.encoded_encoding)
         self.encoded_encoding = str(self.encoded_encoding)
         image.close()
-        image = open("tests/test2.jpeg", "rb")
+        image = open("test2.jpeg", "rb")
         self.encoded_image_2 = base64.b64encode(image.read())
         self.encoded_image_2 = self.encoded_image_2.decode('utf-8')
         self.encoded_encoding_2 = face_recognition.load_image_file(image)

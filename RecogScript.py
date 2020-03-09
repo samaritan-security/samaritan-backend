@@ -7,13 +7,10 @@ Iowa State University
 Author(s): Devin Uner, Ryan Goluch, Ann Gould
 """
 
-import time
-from random import seed
-import random as rand
 import base64
-import numpy as np
 
 from Alerts import check_for_alert
+from BlurDetection import detect_blurry_image
 from FacialRecog import *
 from app import add_unknown_person, add_new_seen
 
@@ -65,7 +62,7 @@ def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/t
                 cv2.imwrite(temp_filename, small_frame)
                 image = cv2.imread(temp_filename)
 
-                if(!detect_blurry_image(image)):
+                if not detect_blurry_image(image):
                     encoded_image = base64.b64encode(small_frame)
                     encoded_image = encoded_image.decode('utf-8')
                     temp = face_recognition.load_image_file(temp_filename)
