@@ -16,8 +16,7 @@ import cv2
 import os
 import numpy as np
 
-from app import get_known_people, get_all_people
-from app import add_known_person, add_unknown_person, get_known_people
+from app import add_known_person, add_unknown_person, get_all_people
 
 
 def get_video_from_file(filename: str):
