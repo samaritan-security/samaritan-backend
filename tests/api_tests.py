@@ -113,6 +113,28 @@ class APITest(unittest.TestCase):
     def test_get_all_alerts(self):
         result = self.app.get("/alerts")
         self.assertEqual(result.status_code, 200)
+ 
+    def test_add_temporary(self):
+        data = {"ref_id" : "5e545bcbd541d79f9ef5b0c7"}
+        result = self.app.post("/authorized", data=json.dumps(data), content_type="application/json")
+        self.assertEqual(result.status_code, 200)
 
+    def test_remove_temporary(self):
+        route = "/temporary/5e545bcbd541d79f9ef5b0c7"
+        result = self.app.delete(route)
+        self.assertEqual(result.status_code, 200)
+    
+    def test_get_temporary(self):
+        result = self.app.get("/temporary")
+        self.assertEqual(result.status_code, 200)
+
+    def test_check_for_temporary(self):
+        route = "/temporary/5e545bcbd541d79f9ef5b0c7"
+        result = self.app.get(route)
+        self.assertEqual(result.status_code, 200)
+        
+    def test_lose_access(self):
+        route = self.app.get("/lose")
+        self.assertEqual(result.status_code, 200)
 if __name__ == '__main__':
     unittest.main()
