@@ -437,8 +437,6 @@ def make_known():
     _id = ObjectId(_id)   
     cursor = db.people.find({"known" : False})
     for document in cursor:
-        print("----------\n")
-        print(type(document["_id"]))
         person = {
             "_id": _id,
             "known" : True,
