@@ -141,6 +141,25 @@ def add_unknown_person(*args):
     return make_response()
 
 
+"""
+given id, returns person
+"""
+@app.route('/people/<id>', methods=['GET'])
+def get_person_by_id(id : str):
+    entries = []
+    cursor = db.people.find({"_id": ObjectId(id)})
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        document['img'] = str(document['img'])
+        document['npy'] = str(document['npy'])
+        entries.append(document)
+    
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+    
+
 
 """
 returns all instances of seen from s_time -> f_time
