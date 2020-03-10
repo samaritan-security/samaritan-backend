@@ -396,7 +396,7 @@ def authorize(id):
         )
     result = db.unauthorized.find({"_id": ref_id})
     result_count = result.count()
-    if !(result_count < 1):
+    if result_count >= 1:
         result = db.unauthorized.delete_one({"_id" : ref_id})
         response = jsonify(result.deleted_count == 1)
         response.headers.add('Acess-Control-Allow-Origin', '*')
@@ -407,12 +407,12 @@ add _id to unauthorized, if _id exists in authorized remove it
 """
 @app.route('/actions/unauthorize/<id>', methods=['GET'])
 def unauthorize(id):
-    ref_id = id
+    ref_id = str(id)
     unauthorized = {
         "_id": ref_id
     }
     try:
-        result = db.unauthorized.insert_one(authorized)
+        result = db.unauthorized.insert_one(unauthorized)
     except:
         return app.response_class(
             status=500,
@@ -420,7 +420,7 @@ def unauthorize(id):
         )
     result = db.authorized.find({"_id": ref_id})
     result_count = result.count()
-    if !(result_count < 1):
+    if result_count >= 1:
         result = db.authorized.delete_one({"_id" : ref_id})
         response = jsonify(result.deleted_count == 1)
         response.headers.add('Acess-Control-Allow-Origin', '*')
@@ -434,13 +434,23 @@ def make_known():
     data = request.get_json("data")
     name = data["name"]
     _id = data["_id"]
-
-    cursor = db.people.find({"known" : False, "_id": _id})
+    _id = ObjectId(_id)   
+    cursor = db.people.find({"known" : False})
     for document in cursor:
-        document["name"] = name
-        document["known"] = True
+        print("----------\n")
+        print(type(document["_id"]))
+        person = {
+            "_id": _id,
+            "known" : True,
+            "name" : name,
+            "img" : document["img"],
+            "npy" : document["npy"]
+        }
+        db.people.delete_one({"_id" : _id})
+        result = db.people.insert_one(person)
 
     return make_response()
+
 """
 route to delete all known and unknown until we 
 figure it out
