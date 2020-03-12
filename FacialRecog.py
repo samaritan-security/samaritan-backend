@@ -104,6 +104,27 @@ def get_face_encodings(frame):
 
 
 """
+for getting images and encodings of unknown people from an image
+"""
+def get_images_and_encodings(frame) -> Tuple[list, list]:
+    rgb_small_frame = frame[:, :, ::-1]
+
+    face_locations = face_recognition.face_locations(rgb_small_frame)
+    face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+
+    face_images = []
+    for location in face_locations:
+        y_s = location[0]
+        x_f = location[1]
+        y_f = location[2]
+        x_s = location[3]
+        crop_frame = frame[y_s:y_f, x_s:x_f]
+        face_images.append(crop_frame)
+
+    return face_encodings, face_images
+
+
+"""
 given a list of encodings from frame and a list of all
 system encdoings, returns a list of lists of boolean values
 """

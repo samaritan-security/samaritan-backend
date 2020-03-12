@@ -25,7 +25,7 @@ def process_video_to_encode(video_feed):
 
     encodings = compare_encodings(frame_encodings, all_encodings)
 
-    return encodings, all_ids, small_frame 
+    return encodings, all_ids, frame 
 
 
 def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/temp.jpeg"):
@@ -41,13 +41,18 @@ def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/t
                 image = cv2.imread(temp_filename)
 
                 if not detect_blurry_image(image):
-                    encoded_image = base64.b64encode(small_frame)
-                    encoded_image = encoded_image.decode('utf-8')
-                    temp = face_recognition.load_image_file(temp_filename)
-                    encoding = face_recognition.face_encodings(temp)
-                    encoding = str(encoding)
-                    data = {"img": encoded_image, "npy": encoding}
-                    add_unknown_person(data)
+
+                    frame = cv2.resize(image, (0, 0), fx=0.75, fy=0.75)
+                    unknown_encodings, unknown_images = get_images_and_encodings(frame)
+
+                    i = 0
+                    for encoding in unknown encodings:
+                        encoded_image = base64.b64encode(unknown_images[i]).decode('utf-8')
+                        encoding_str = str(encoding[i])
+                        data = {"img":encoded_image, "npy": encoding_str}
+                        add_unknown_person(data)
+                        i = i + 1
+                        
 
 '''
 Main script function
