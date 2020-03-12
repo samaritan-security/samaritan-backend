@@ -15,37 +15,15 @@ from FacialRecog import *
 from app import add_unknown_person, add_new_seen
 
 
-def process_video_to_encode(video_feed, images_directory, temp_filename="images/temp.jpeg"):
+def process_video_to_encode(video_feed):
 
     all_ids, all_encodings = get_all_people_information()
 
+    frame = get_frame(video_feed)
 
-    ret, frame = video_feed.read()
-    small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
+    frame_encodings = get_face_encodings(frame)
 
-    # Convert the image from BGR color (which OpenCV uses)
-    # to RGB color (which face_recognition uses)
-    rgb_small_frame = small_frame[:, :, ::-1]
-
-    # Find all the faces and face encodings in the current frame of video
-    face_locations = face_recognition.face_locations(rgb_small_frame)
-    face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
-
-    cv2.imwrite(temp_filename, small_frame)
-    temp = face_recognition.load_image_file(temp_filename)
-    temp_encode = face_recognition.face_encodings(temp)
-
-
-    if len(temp_encode) == 0:
-        return None, all_ids, small_frame 
-
-    encodings = []
-    for face in all_encodings: 
-        if len(temp_encode) == 1:
-            temp = [face_recognition.compare_faces(face, temp_encode)]
-            encodings.append(temp)
-        else:
-            encodings.append(face_recognition.compare_faces(face, temp_encode))
+    encodings = compare_encodings(frame_encodings, all_encodings)
 
     return encodings, all_ids, small_frame 
 
@@ -76,10 +54,9 @@ Main script function
 '''
 def main():
     video_capture = get_camera_ip_from_file("camera_ip.txt")
-    unknown_queue = []
 
     while True:
-        encodings, all_ids, small_frame = process_video_to_encode(video_capture, "images/employees")
+        encodings, all_ids, small_frame = process_video_to_encode(video_capture)
         check_encodings(encodings, all_ids, small_frame)
 
 

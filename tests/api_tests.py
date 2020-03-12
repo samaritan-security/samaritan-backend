@@ -6,7 +6,7 @@ import face_recognition
 import datetime
 
 from app import app
-
+from FacialRecog import *
 
 
 
@@ -16,19 +16,19 @@ class APITest(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-        image = open("Ryan_Goluch.jpeg", "rb")
+        image = open("tests/Ryan_Goluch.jpeg", "rb")
         self.encoded_image = base64.b64encode(image.read())
         self.encoded_image = self.encoded_image.decode('utf-8')
-        self.encoded_encoding = face_recognition.load_image_file(image)
-        self.encoded_encoding = face_recognition.face_encodings(self.encoded_encoding)
-        self.encoded_encoding = str(self.encoded_encoding)
+        frame = cv2.resize(cv2.imread("tests/Ryan_Goluch.jpeg"), (0, 0), fx=0.75, fy=0.75)
+        self.encoded_encoding = get_face_encodings(frame)
+        self.encoded_encoding = str(self.encoded_encoding[0])
         image.close()
-        image = open("test2.jpeg", "rb")
+        image = open("tests/test2.jpeg", "rb")
         self.encoded_image_2 = base64.b64encode(image.read())
         self.encoded_image_2 = self.encoded_image_2.decode('utf-8')
-        self.encoded_encoding_2 = face_recognition.load_image_file(image)
-        self.encoded_encoding_2 = face_recognition.face_encodings(self.encoded_encoding_2)
-        self.encoded_encoding_2 = str(self.encoded_encoding_2)
+        frame = cv2.resize(cv2.imread("tests/test2.jpeg"), (0, 0), fx=0.75, fy=0.75)
+        self.encoded_encoding_2 = get_face_encodings(frame)
+        self.encoded_encoding_2 = str(self.encoded_encoding_2[0])
         image.close()
         self.name = "Ryan Goluch"
 
