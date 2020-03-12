@@ -46,13 +46,13 @@ def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/t
                     unknown_encodings, unknown_images = get_images_and_encodings(frame)
 
                     i = 0
-                    for encoding in unknown encodings:
+                    for encoding in unknown_encodings:
                         encoded_image = base64.b64encode(unknown_images[i]).decode('utf-8')
                         encoding_str = str(encoding[i])
                         data = {"img":encoded_image, "npy": encoding_str}
                         add_unknown_person(data)
                         i = i + 1
-                        
+
 
 '''
 Main script function
