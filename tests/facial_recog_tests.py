@@ -73,5 +73,38 @@ class ScriptTest(unittest.TestCase):
         self.assertEqual(True in ryan[:len(ryan)], True)
    
 
+    """
+    tests that it works for image with 1 person
+    """
+    def test_get_images_and_encodings_1(self):
+        image = cv2.imread("tests/Ryan_Goluch.jpeg")
+        frame = cv2.resize(image, (0, 0), fx=0.75, fy=0.75)
+        frame_encodings, frame_images = get_images_and_encodings(frame)
+
+        i = 0
+        for frame in frame_images: 
+            img = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
+            cv2.imwrite("tests/im_{}.jpeg".format(i), img)
+            i = i + 1
+
+        self.assertEqual(i == 1, True)
+
+
+    """
+    tests that it works for image with 2 people
+    """
+    def test_get_images_and_encodings_2(self):
+        image = cv2.imread("tests/test1.jpeg")
+        frame = cv2.resize(image, (0, 0), fx=0.75, fy=0.75)
+        frame_encodings, frame_images = get_images_and_encodings(frame)
+
+        i = 0
+        for frame in frame_images: 
+            img = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
+            cv2.imwrite("tests/im_{}.jpeg".format(i), img)
+            i = i + 1
+
+        self.assertEqual(i == 2, True)
+
 if __name__ == '__main__':
     unittest.main()
