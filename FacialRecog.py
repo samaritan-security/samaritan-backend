@@ -60,39 +60,80 @@ def scan_for_known_people_from_db(npy_known: str) -> dict:
     return detected_faces
 
 
-'''
-Helper function for image pre-processing
-'''
-def image_files_in_folder(folder):
-    # following code snippet from face_recognition
-    return [os.path.join(folder, f) for f in os.listdir(folder) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
-
-
-'''
-Updates the known persons in the frame from the facial recog script
-'''
-def add_to_known_stream(name: str, encoded_image: str, encoded_encoding: str):
-    data = {"name": name, "img": encoded_image, "npy": encoded_encoding}
-    return add_known_person(data)
-
-
-'''
-Updates the unknown persons in the frame from facial recog script
-'''
-def add_to_unknown_stream(encoded_image: str):
-    data = {"img": encoded_image}
-    return add_unknown_person(data)
-
-
+"""
+returns list of ids and encodings
+"""
 def get_all_people_information() -> Tuple[list, list]:
     all_encodings = []
     all_ids = []
 
     db_data = get_all_people("not_api_call")
     for i in db_data:
-        npy = np.fromstring(i['npy'], count=128)
+        formatted_npy_str = i['npy'].replace(r"\n", "")[2:-2] #get rid on newlines and "[]"
+        iterable = formatted_npy_str.split() #make string values iterable
+        npy = np.fromiter(iterable, float) #create npy by iterating over strings
         all_encodings.append(npy)
         id = i['_id']
         all_ids.append(id)
 
     return all_ids, all_encodings
+
+
+"""
+given a video feed, returns a frame
+"""
+def get_frame(video_feed):
+    ret, frame = video_feed.read()
+    small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
+    return small_frame
+
+
+"""
+given a frame, returns a list of nparray face encodings, shape = (128,)
+"""
+def get_face_encodings(frame):
+     # Convert the image from BGR color (which OpenCV uses)
+    # to RGB color (which face_recognition uses)
+    rgb_small_frame = frame[:, :, ::-1]
+
+    # Find all the faces and face encodings in the current frame of video
+    face_locations = face_recognition.face_locations(rgb_small_frame)
+    face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+
+    return face_encodings
+
+
+"""
+for getting images and encodings of unknown people from an image
+"""
+def get_images_and_encodings(frame) -> Tuple[list, list]:
+    rgb_small_frame = frame[:, :, ::-1]
+
+    face_locations = face_recognition.face_locations(rgb_small_frame)
+    face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+
+    face_images = []
+    for location in face_locations:
+        y_s = location[0]
+        x_f = location[1]
+        y_f = location[2]
+        x_s = location[3]
+        crop_frame = frame[y_s:y_f, x_s:x_f]
+        face_images.append(crop_frame)
+
+    return face_encodings, face_images
+
+
+"""
+given a list of encodings from frame and a list of all
+system encdoings, returns a list of lists of boolean values
+"""
+def compare_encodings(frame_encodings, all_encodings):
+    if len(frame_encodings) == 0:
+        return None
+
+    encodings = []
+    for face in all_encodings: 
+        encodings.append(face_recognition.compare_faces(face, frame_encodings))
+
+    return encodings
