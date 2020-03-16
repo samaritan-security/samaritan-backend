@@ -24,9 +24,12 @@ def get_video_from_file(filename: str):
 
 
 def get_camera_ip_from_file(filename: str):
-    file = open(filename, "r")
-    ip = file.readline()
-    video_feed = cv2.VideoCapture("http://" + str(ip).replace("\n", "") + "/video.mjpg")
+    ip = []
+    video_feed = []
+    with open(filename, "r") as file :
+        ip += file.readline()
+    for i in ip:
+        video_feed += cv2.VideoCapture("http://" + str(i).replace("\n", "") + "/video.mjpg")
     file.close()
     return video_feed
 
@@ -49,8 +52,6 @@ gets all encoding/id pairs from people db
 def scan_for_known_people_from_db(npy_known: str) -> dict:
 
     all_people, all_encodings = get_all_people_information()
-
-
     all_encodings = np.array(all_encodings)
     npy_array = np.array(npy_known)
     detected_faces = face_recognition.compare_faces(all_encodings, npy_array)
@@ -83,8 +84,14 @@ def get_all_people_information() -> Tuple[list, list]:
 given a video feed, returns a frame
 """
 def get_frame(video_feed):
-    ret, frame = video_feed.read()
-    small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
+    ret = []
+    frame = []
+    small_frame = []
+    for f in video_feed:
+        ret_temp, frame_temp = f.read()
+        ret += ret_temp
+        frame += frame_temp
+        small_frame += cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
     return small_frame
 
 
@@ -92,13 +99,18 @@ def get_frame(video_feed):
 given a frame, returns a list of nparray face encodings, shape = (128,)
 """
 def get_face_encodings(frame):
-     # Convert the image from BGR color (which OpenCV uses)
+    # Convert the image from BGR color (which OpenCV uses)
     # to RGB color (which face_recognition uses)
-    rgb_small_frame = frame[:, :, ::-1]
+    rgb_small_frame = []
+    for f in frame:
+        rgb_small_frame += f[:, :, ::-1]
 
     # Find all the faces and face encodings in the current frame of video
-    face_locations = face_recognition.face_locations(rgb_small_frame)
-    face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+    face_encodings = []
+
+    for r in rgb_small_frame:
+        face_locations = face_recognition.face_locations(r)
+        face_encodings += face_recognition.face_encodings(r, face_locations)
 
     return face_encodings
 
@@ -133,7 +145,8 @@ def compare_encodings(frame_encodings, all_encodings):
         return None
 
     encodings = []
-    for face in all_encodings: 
-        encodings.append(face_recognition.compare_faces(face, frame_encodings))
+    for face in all_encodings:
+        for entry in frame_encodings:
+            encodings.append(face_recognition.compare_faces(face, entry))
 
     return encodings
