@@ -19,7 +19,7 @@ def process_video_to_encode(video_feed):
 
     all_ids, all_encodings = get_all_people_information()
     frame = []
-    frame = get_frame(video_feed)
+    frame += get_frame(video_feed)
     frame_encodings = get_face_encodings(frame)
     encodings = compare_encodings(frame_encodings, all_encodings)
 
