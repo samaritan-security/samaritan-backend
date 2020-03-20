@@ -93,14 +93,11 @@ given a video feed, returns a frame
 """
 def get_frame(video_feed):
     frame = []
-    # List of lists to hold all of the frames from each feed
-    # feed_frames = []
     for f in video_feed:
+        # TODO need to make sure this is ok for live streams, works for videos
         for x in f:
-            ret_temp, frame_temp = x
-            small_frame = cv2.resize(frame_temp, (0, 0), fx=0.75, fy=0.75)
+            small_frame = cv2.resize(x, (0, 0), fx=0.75, fy=0.75)
             frame.append(small_frame)
-            # small_frame.append(cv2.resize(f, (0, 0), fx=0.75, fy=0.75))
     return frame
 
 

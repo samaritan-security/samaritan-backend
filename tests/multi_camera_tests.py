@@ -19,6 +19,10 @@ class MultiCameraTests(unittest.TestCase):
         self.video_two = get_video_from_file("tests/multi_camera_test_2.mov")
         self.employee_dir = "../images/employees"
 
+    """
+    Tests the get_frame method in FacialRecog.py to make sure it works with the supplied
+    videos from the setup function
+    """
     def test_get_frame(self):
         self.setup()
         video_feeds = []
