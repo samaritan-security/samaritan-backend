@@ -20,7 +20,15 @@ from app import add_known_person, add_unknown_person, get_all_people
 
 
 def get_video_from_file(filename: str):
-    return cv2.VideoCapture(filename)
+    cap = cv2.VideoCapture(filename)
+    feed = []
+    while True:
+        ret, frame = cap.read()
+
+        if frame is None:
+            break
+        feed.append(frame)
+    return feed
 
 
 def get_camera_ip_from_file(filename: str):
@@ -84,15 +92,16 @@ def get_all_people_information() -> Tuple[list, list]:
 given a video feed, returns a frame
 """
 def get_frame(video_feed):
-    ret = []
     frame = []
-    small_frame = []
+    # List of lists to hold all of the frames from each feed
+    # feed_frames = []
     for f in video_feed:
-        ret_temp, frame_temp = f.read()
-        ret += ret_temp
-        frame += frame_temp
-        small_frame += cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
-    return small_frame
+        for x in f:
+            ret_temp, frame_temp = x
+            small_frame = cv2.resize(frame_temp, (0, 0), fx=0.75, fy=0.75)
+            frame.append(small_frame)
+            # small_frame.append(cv2.resize(f, (0, 0), fx=0.75, fy=0.75))
+    return frame
 
 
 """

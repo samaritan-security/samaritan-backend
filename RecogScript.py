@@ -18,12 +18,9 @@ from app import add_unknown_person, add_new_seen
 def process_video_to_encode(video_feed):
 
     all_ids, all_encodings = get_all_people_information()
-
     frame = []
     frame = get_frame(video_feed)
-
     frame_encodings = get_face_encodings(frame)
-
     encodings = compare_encodings(frame_encodings, all_encodings)
 
     return encodings, all_ids, frame 
