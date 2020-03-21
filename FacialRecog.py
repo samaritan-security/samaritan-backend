@@ -140,7 +140,6 @@ def compare_encodings(frame_encodings, all_encodings):
 
     encodings = []
     for face in all_encodings:
-        for entry in frame_encodings:
-            encodings.append(face_recognition.compare_faces(face, entry))
+        encodings.append(face_recognition.compare_faces(face, frame_encodings))
 
     return encodings
