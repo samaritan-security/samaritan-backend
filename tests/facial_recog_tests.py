@@ -107,9 +107,7 @@ class ScriptTest(unittest.TestCase):
         self.assertEqual(i == 2, True)
 
     """
-    TODO figure out public ip cams to use in /camera_ip_test.txt 
-    so we don't have to worry about camera's being down to run tests
-    leaving this commented out for now.
+    
     """
     def test_get_multiple_video_feeds_from_file(self):
         feeds = get_multiple_video_feeds_from_file("tests/camera_ip_test.txt")
