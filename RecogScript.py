@@ -25,7 +25,7 @@ def process_video_to_encode(video_feed):
     return encodings, all_ids, frame 
 
 
-def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/temp.jpeg"):
+def check_encodings(all_encodings, all_ids, small_frame, temp_filename):
     if all_encodings is not None:
         for entry in all_encodings:
             if True in entry[:len(entry)]:
@@ -58,15 +58,14 @@ Main script function
 def main():
     video_capture = []
     video_capture += get_camera_ip_from_file("camera_ip.txt")
+    x = 0
 
     while True:
         for v in video_capture:
             encodings, all_ids, small_frame = process_video_to_encode(v)
-            # temp_file_names = []
-            # x = 0
-            # for i in small_frame:
-            #     temp_file_names += "images/temp_%d.jpeg", x
-            check_encodings(encodings, all_ids, small_frame)
+            temp_file_name = "images/temp_%d.jpeg" % x
+            x += 1
+            check_encodings(encodings, all_ids, small_frame, temp_file_name)
 
 
 if __name__ == "__main__":
