@@ -65,7 +65,7 @@ def main():
         # so we can tie who is seen by what camera
         video_feeds = get_multiple_camera_feeds_from_file("camera_ip.txt")
         for video_feed in video_feeds:
-            encodings, all_ids, small_frame = process_video_to_encode(video_capture)
+            encodings, all_ids, small_frame = process_video_to_encode(video_feed)
             check_encodings(encodings, all_ids, small_frame)
 
 
