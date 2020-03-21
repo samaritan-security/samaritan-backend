@@ -27,7 +27,7 @@ def get_video_from_file(filename: str):
         if frame is None:
             break
         feed.append(frame)
-    return feed
+    return frame
 
 
 def get_camera_ip_from_file(filename: str):
@@ -89,34 +89,22 @@ def get_all_people_information() -> Tuple[list, list]:
 given a video feed, returns a frame
 """
 def get_frame(video_feed):
-    feed_frames = []
-    for f in video_feed:
-        # TODO need to make sure this is ok for live streams, works for videos
-        ret, frame = f.read()
-        small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
-        feed_frames.append(small_frame)
-    return feed_frames
+    ret, frame = video_feed.read()
+    small_frame = cv2.resize(frame, (0, 0), fx=0.75, fy=0.75)
+    return small_frame
 
 
 """
 given a frame, returns a list of nparray face encodings, shape = (128,)
 """
-def get_face_encodings(frame_list):
+def get_face_encodings(frame):
     # Convert the image from BGR color (which OpenCV uses)
     # to RGB color (which face_recognition uses)
-    rgb_small_frame = []
-    for f in frame_list:
-        # temp = []
-        # for x in f:
-        rgb_small_frame += f[:, :, ::-1]
-        # rgb_small_frame.append(temp)
+    rgb_small_frame = frame[:, :, ::-1]
 
     # Find all the faces and face encodings in the current frame of video
-    face_encodings = []
-
-    for r in rgb_small_frame:
-        face_locations = face_recognition.face_locations(r)
-        face_encodings += face_recognition.face_encodings(r, face_locations)
+    face_locations = face_recognition.face_locations(rgb_small_frame)
+    face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
     return face_encodings
 

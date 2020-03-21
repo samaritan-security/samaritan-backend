@@ -18,8 +18,7 @@ from app import add_unknown_person, add_new_seen
 def process_video_to_encode(video_feed):
 
     all_ids, all_encodings = get_all_people_information()
-    frame = []
-    frame += get_frame(video_feed)
+    frame = get_frame(video_feed)
     frame_encodings = get_face_encodings(frame)
     encodings = compare_encodings(frame_encodings, all_encodings)
 
@@ -58,15 +57,18 @@ Main script function
 '''
 def main():
     video_capture = []
-    video_capture = get_camera_ip_from_file("camera_ip.txt")
+    video_capture += get_camera_ip_from_file("camera_ip.txt")
+    # video_capture += get_video_from_file("/Users/RyanGoluch/Desktop/test_mov.mov")
+    # video_capture += get_video_from_file("/Users/RyanGoluch/Desktop/test_mov.mov")
 
     while True:
-        encodings, all_ids, small_frame = process_video_to_encode(video_capture)
-        temp_file_names = []
-        x = 0
-        for i in small_frame:
-            temp_file_names += "images/temp_%d.jpeg", x
-        check_encodings(encodings, all_ids, small_frame, temp_file_names)
+        for v in video_capture:
+            encodings, all_ids, small_frame = process_video_to_encode(v)
+            temp_file_names = []
+            x = 0
+            for i in small_frame:
+                temp_file_names += "images/temp_%d.jpeg", x
+            check_encodings(encodings, all_ids, small_frame, temp_file_names)
 
 
 if __name__ == "__main__":
