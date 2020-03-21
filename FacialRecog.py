@@ -20,13 +20,21 @@ from app import add_known_person, add_unknown_person, get_all_people
 
 
 def get_video_from_file(filename: str):
-    return cv2.VideoCapture(filename)
+    cap = cv2.VideoCapture(filename)
+    feed = []
+    while True:
+        ret, frame = cap.read()
+        if frame is None:
+            break
+        feed.append(frame)
+    return frame
 
 
 def get_camera_ip_from_file(filename: str):
-    file = open(filename, "r")
-    ip = file.readline()
-    video_feed = cv2.VideoCapture("http://" + str(ip).replace("\n", "") + "/video.mjpg")
+    video_feed = []
+    with open(filename, "r") as file:
+        ip = file.readline()
+        video_feed.append(cv2.VideoCapture("http://" + str(ip).replace("\n", "") + "/video.mjpg"))
     file.close()
     return video_feed
 
@@ -49,8 +57,6 @@ gets all encoding/id pairs from people db
 def scan_for_known_people_from_db(npy_known: str) -> dict:
 
     all_people, all_encodings = get_all_people_information()
-
-
     all_encodings = np.array(all_encodings)
     npy_array = np.array(npy_known)
     detected_faces = face_recognition.compare_faces(all_encodings, npy_array)
@@ -92,7 +98,7 @@ def get_frame(video_feed):
 given a frame, returns a list of nparray face encodings, shape = (128,)
 """
 def get_face_encodings(frame):
-     # Convert the image from BGR color (which OpenCV uses)
+    # Convert the image from BGR color (which OpenCV uses)
     # to RGB color (which face_recognition uses)
     rgb_small_frame = frame[:, :, ::-1]
 
@@ -126,14 +132,14 @@ def get_images_and_encodings(frame) -> Tuple[list, list]:
 
 """
 given a list of encodings from frame and a list of all
-system encdoings, returns a list of lists of boolean values
+system encodings, returns a list of lists of boolean values
 """
 def compare_encodings(frame_encodings, all_encodings):
     if len(frame_encodings) == 0:
         return None
 
     encodings = []
-    for face in all_encodings: 
+    for face in all_encodings:
         encodings.append(face_recognition.compare_faces(face, frame_encodings))
 
     return encodings

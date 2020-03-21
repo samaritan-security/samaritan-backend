@@ -18,17 +18,14 @@ from app import add_unknown_person, add_new_seen
 def process_video_to_encode(video_feed):
 
     all_ids, all_encodings = get_all_people_information()
-
     frame = get_frame(video_feed)
-
     frame_encodings = get_face_encodings(frame)
-
     encodings = compare_encodings(frame_encodings, all_encodings)
 
     return encodings, all_ids, frame 
 
 
-def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/temp.jpeg"):
+def check_encodings(all_encodings, all_ids, small_frame, temp_filename):
     if all_encodings is not None:
         for entry in all_encodings:
             if True in entry[:len(entry)]:
@@ -40,30 +37,36 @@ def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/t
                 cv2.imwrite(temp_filename, small_frame)
                 image = cv2.imread(temp_filename)
 
-                if not detect_blurry_image(image):
+                if not detect_blurry_image(image, 200):
 
                     frame = cv2.resize(image, (0, 0), fx=0.75, fy=0.75)
                     unknown_encodings, unknown_images = get_images_and_encodings(frame)
 
                     i = 0
                     for encoding in unknown_encodings:
-                        encoded_image = base64.b64encode(unknown_images[i]).decode('utf-8')
+                        encoded_image = base64.b64encode(np.array(unknown_images[i])).decode('utf-8')
                         encoding_str = str(encoding[i])
                         data = {"img":encoded_image, "npy": encoding_str}
                         add_unknown_person(data)
                         i = i + 1
 
 
+
 '''
 Main script function
 '''
 def main():
-    video_capture = get_camera_ip_from_file("camera_ip.txt")
+    video_capture = []
+    video_capture += get_camera_ip_from_file("camera_ip.txt")
+    x = 0
 
     while True:
-        encodings, all_ids, small_frame = process_video_to_encode(video_capture)
-        check_encodings(encodings, all_ids, small_frame)
+        for v in video_capture:
+            encodings, all_ids, small_frame = process_video_to_encode(v)
+            temp_file_name = "images/temp_%d.jpeg" % x
+            x += 1
+            check_encodings(encodings, all_ids, small_frame, temp_file_name)
 
 
-if __name__== "__main__":
+if __name__ == "__main__":
     main()

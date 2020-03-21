@@ -196,7 +196,11 @@ def add_new_seen(ref_id):
         "created_at": time
     }
     result = db.seen.insert_one(seen)
-    return make_response()
+    if len(ref_id) == 0:
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return result
 
 
 """
@@ -378,7 +382,11 @@ def add_new_alert(ref_id):
         "created_at": time
     }
     result = db.alerts.insert_one(alert)
-    return make_response()
+    if len(ref_id) == 0:
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return result
 
 
 """
