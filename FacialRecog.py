@@ -30,6 +30,25 @@ def get_camera_ip_from_file(filename: str):
     file.close()
     return video_feed
 
+"""
+returns a list of video feeds given a filename of a file
+containing ip's, 1 per line
+"""
+def get_multiple_video_feeds_from_file(filename: str):
+    video_feeds = []
+    file = open(filename, "r")
+    while True:
+        ip = file.readline()
+        if not ip:
+            break
+        else:
+            video_feed = cv2.VideoCapture("http://" + str(ip).replace("\n", "") + "/video.mjpg")
+            video_feeds.append(video_feed)
+
+    file.close()
+    return video_feeds
+
+
 
 
 '''

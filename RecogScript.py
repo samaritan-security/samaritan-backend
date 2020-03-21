@@ -58,11 +58,15 @@ def check_encodings(all_encodings, all_ids, small_frame, temp_filename="images/t
 Main script function
 '''
 def main():
-    video_capture = get_camera_ip_from_file("camera_ip.txt")
 
     while True:
-        encodings, all_ids, small_frame = process_video_to_encode(video_capture)
-        check_encodings(encodings, all_ids, small_frame)
+        # when we start storing cameras {ip, nickname} in db, then we can pull
+        # info from there and then that information will be passed down
+        # so we can tie who is seen by what camera
+        video_feeds = get_multiple_camera_feeds_from_file("camera_ip.txt")
+        for video_feed in video_feeds:
+            encodings, all_ids, small_frame = process_video_to_encode(video_capture)
+            check_encodings(encodings, all_ids, small_frame)
 
 
 if __name__== "__main__":
