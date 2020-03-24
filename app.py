@@ -349,7 +349,7 @@ returns all alerts instances from s_time => f_time
 for a specific camera
 """
 @app.route('/alerts/<camera_id>/<s_time>/<f_time>', methods=['GET'])
-def get_alerts_time_intervale(camera_id, s_time, f_time):
+def get_alerts_time_interval(camera_id, s_time, f_time):
     s_time = s_time.replace("%", " ")
     f_time = f_time.replace("%", " ")
 
