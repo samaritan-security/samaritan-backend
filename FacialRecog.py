@@ -215,8 +215,8 @@ def process_comparisons(comparisons, ids, camera, frame):
         for comparison in comparisons:
             if True in comparison[:len(comparison)]:
                 id = ids[comparisons.index(comparison)]
-                add_new_seen(id)
-                check_for_alert(id)
+                add_new_seen(id, str(camera['_id']))
+                check_for_alert(id, str(camera['_id']))
             else:
                 temp_filename = "images/" + str(camera['nickname']) + ".jpg"
                 cv2.imwrite(temp_filename, frame)
