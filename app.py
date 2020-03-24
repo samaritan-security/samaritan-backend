@@ -44,13 +44,14 @@ def get_all_people(*args):
         return response
     return entries
 
+
 """
 gets all known people
 """
 @app.route('/people/known', methods=['GET'])
 def get_known_people(*args):
     entries = []
-    cursor = db.people.find({"known" : True})
+    cursor = db.people.find({"known": True})
     for document in cursor:
         document['_id'] = str(document['_id'])
         document['img'] = str(document['img'])
@@ -64,14 +65,13 @@ def get_known_people(*args):
     return entries
 
 
-
 """
 gets all unknown people
 """
 @app.route('/people/unknown', methods=['GET'])
 def get_unknown_people(*args):
     entries = []
-    cursor = db.people.find({"known" : False})
+    cursor = db.people.find({"known": False})
     for document in cursor:
         document['_id'] = str(document['_id'])
         document['img'] = str(document['img'])
@@ -101,10 +101,10 @@ def add_known_person(*args):
     name = data["name"]
     known = True
     person = {
-        "known" : known,
-        "name" : name,
-        "img" : img,
-        "npy" : npy
+        "known": known,
+        "name": name,
+        "img": img,
+        "npy": npy
     }
     result = db.people.insert_one(person)
     if flag:
@@ -129,9 +129,9 @@ def add_unknown_person(*args):
     npy = data['npy']
     known = False
     person = {
-        "known" : known,
-        "img" : img,
-        "npy" : npy
+        "known": known,
+        "img": img,
+        "npy": npy
     }
     result = db.people.insert_one(person)
     if flag:
@@ -145,7 +145,7 @@ def add_unknown_person(*args):
 given id, returns person
 """
 @app.route('/people/<id>', methods=['GET'])
-def get_person_by_id(id : str):
+def get_person_by_id(id: str):
     entries = []
     cursor = db.people.find({"_id": ObjectId(id)})
     for document in cursor:
@@ -153,19 +153,18 @@ def get_person_by_id(id : str):
         document['img'] = str(document['img'])
         document['npy'] = str(document['npy'])
         entries.append(document)
-    
+
     response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-    
-
 
 """
 returns all instances of seen from s_time -> f_time
+for a specific camera
 """
-@app.route('/seen/<s_time>/<f_time>', methods=['GET'])
-def get_seen_time_interval(s_time : str, f_time: str):
+@app.route('/seen/<camera_id>/<s_time>/<f_time>', methods=['GET'])
+def get_seen_time_interval(camera_id: str, s_time: str, f_time: str):
     s_time = s_time.replace("%", " ")
     f_time = f_time.replace("%", " ")
 
@@ -174,18 +173,19 @@ def get_seen_time_interval(s_time : str, f_time: str):
 
     entries = []
     cursor = db.seen.find({
-        "created_at" : {
-            "$gte" : start_time,
-            "$lte" : end_time
+        "camera_id": camera_id,
+        "created_at": {
+            "$gte": start_time,
+            "$lte": end_time
         }})
-        
+
     for document in cursor:
         document['_id'] = str(document['_id'])
         entries.append(document)
 
-    response = jsonify(entries)    
+    response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
-        
+
     return response
 
 
@@ -194,10 +194,11 @@ adds new seen
 --internal use only--
 """
 @app.route('/seen/<ref_id>', methods=['PUT'])
-def add_new_seen(ref_id):
+def add_new_seen(ref_id, camera_id):
     time = datetime.datetime.now()
     seen = {
         "ref_id": ref_id,
+        "camera_id": camera_id,
         "created_at": time
     }
     result = db.seen.insert_one(seen)
@@ -251,7 +252,7 @@ returns true if item deleted, false otherwise
 """
 @app.route('/authorized/<ref_id>', methods=['DELETE'])
 def remove_from_authorized(ref_id):
-    result = db.authorized.delete_one({"_id" : ref_id})
+    result = db.authorized.delete_one({"_id": ref_id})
     response = jsonify(result.deleted_count == 1)
     response.headers.add('Acess-Control-Allow-Origin', '*')
     return response
@@ -302,7 +303,7 @@ removes given ref_id from unauthorized db
 """
 @app.route('/unauthorized/<ref_id>', methods=['DELETE'])
 def remove_from_unauthorized(ref_id):
-    result = db.unauthorized.delete_one({"_id" : ref_id})
+    result = db.unauthorized.delete_one({"_id": ref_id})
     response = jsonify(result.deleted_count == 1)
     response.headers.add('Acess-Control-Allow-Origin', '*')
     return response
@@ -324,13 +325,12 @@ def get_all_unauthorized():
     return response
 
 
-
 """
 checks if a ref_id exists in the unauthorized db.
 returns True if exists, False otherwise
 """
 @app.route('/unauthorized/<ref_id>', methods=['GET'])
-def check_for_unauthorized(ref_id : str):
+def check_for_unauthorized(ref_id: str):
     result = db.unauthorized.find({"_id": ref_id})
     result_count = result.count()
     if result_count < 1:
@@ -346,9 +346,10 @@ def check_for_unauthorized(ref_id : str):
 
 """
 returns all alerts instances from s_time => f_time
+for a specific camera
 """
-@app.route('/alerts/<s_time>/<f_time>', methods=['GET'])
-def get_alerts_time_intervale(s_time, f_time):
+@app.route('/alerts/<camera_id>/<s_time>/<f_time>', methods=['GET'])
+def get_alerts_time_interval(camera_id, s_time, f_time):
     s_time = s_time.replace("%", " ")
     f_time = f_time.replace("%", " ")
 
@@ -357,11 +358,12 @@ def get_alerts_time_intervale(s_time, f_time):
 
     entries = []
     cursor = db.alerts.find({
-        "created_at" : {
-            "$gte" : start_time,
-            "$lte" : end_time
+        "camera_id": camera_id,
+        "created_at": {
+            "$gte": start_time,
+            "$lte": end_time
         }})
-        
+
     for document in cursor:
         document['_id'] = str(document['_id'])
         entries.append(document)
@@ -377,10 +379,11 @@ adds new alert
 --only accessed internally--
 """
 @app.route('/alerts/<ref_id>', methods=['PUT'])
-def add_new_alert(ref_id : str):
+def add_new_alert(ref_id: str, camera_id: str):
     time = datetime.datetime.utcnow()
     alert = {
         "ref_id": ref_id,
+        "camera_id": camera_id,
         "created_at": time
     }
     result = db.alerts.insert_one(alert)
@@ -418,8 +421,8 @@ def add_new_camera(*args):
     ip = data['ip']
     nickname = data['nickname']
     camera = {
-        "ip" : ip,
-        "nickname" : nickname
+        "ip": ip,
+        "nickname": nickname
     }
     result = db.cameras.insert_one(camera)
     if flag:
@@ -439,7 +442,7 @@ def get_camera_by_id(camera_id):
     for document in cursor:
         document['_id'] = str(document['_id'])
         entries.append(document)
-    
+
     response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
@@ -465,7 +468,6 @@ def get_all_cameras(*args):
     return response
 
 
-
 """
 route to delete all known and unknown until we 
 figure it out
@@ -477,7 +479,9 @@ def delete_all_known_unknown():
     db.authorized.remove({})
     db.unauthorized.remove({})
     db.seen.remove({})
+    db.alerts.remove({})
     db.people.remove({})
+    db.cameras.remove({})
 
     return make_response()
 
