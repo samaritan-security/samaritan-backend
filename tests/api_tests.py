@@ -5,7 +5,7 @@ import base64
 import face_recognition
 import datetime
 
-from app import app
+from app import app, add_new_alert, add_new_seen
 from FacialRecog import *
 
 
@@ -62,9 +62,8 @@ class APITest(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
 
     def test_add_new_seen(self):
-        route = "/seen/5e545bcbd541d79f9ef5b0c7"
-        result = self.app.put(route)
-        self.assertEqual(result.status_code, 200)
+        result = add_new_seen("5e545bcbd541d79f9ef5b0c7")
+        self.assertEqual(result.acknowledged, True)
 
     def test_get_all_seen(self):
         result = self.app.get("/seen")
@@ -109,13 +108,26 @@ class APITest(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
 
     def test_add_new_alert(self):
-        route = "/alerts/5e545bcbd541d79f9ef5b0c7"
-        result = self.app.put(route)
-        self.assertEqual(result.status_code, 200)
+        result = add_new_alert("5e545bcbd541d79f9ef5b0c7")
+        self.assertEqual(result.acknowledged, True)
 
     def test_get_all_alerts(self):
         result = self.app.get("/alerts")
         self.assertEqual(result.status_code, 200)
 
+    def test_add_new_camera(self):
+        data = {"ip" : "192.168.1.107", "nickname" : "home-camera"}
+        result = self.app.post("/camera", data=json.dumps(data), content_type="application/json")
+        self.assertEqual(result.status_code, 200)
+
+    def test_get_camera_by_id(self):
+        route = "/camera/5e795368354d37c78043626e"
+        result = self.app.get(route)
+        self.assertEqual(result.status_code, 200)
+
+    def test_get_all_cameras(self):
+        route = "/camera"
+        result = self.app.get(route)
+        self.assertEquals(result.status_code, 200)
 if __name__ == '__main__':
     unittest.main()
