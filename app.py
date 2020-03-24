@@ -188,6 +188,11 @@ def get_seen_time_interval(s_time : str, f_time: str):
         
     return response
 
+
+"""
+adds new seen
+--internal use only--
+"""
 @app.route('/seen/<ref_id>', methods=['PUT'])
 def add_new_seen(ref_id):
     time = datetime.datetime.now()
@@ -196,10 +201,6 @@ def add_new_seen(ref_id):
         "created_at": time
     }
     result = db.seen.insert_one(seen)
-    if len(ref_id) == 0:
-        response = jsonify(result)
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        return response
     return result
 
 
@@ -373,19 +374,16 @@ def get_alerts_time_intervale(s_time, f_time):
 
 """
 adds new alert
+--only accessed internally--
 """
 @app.route('/alerts/<ref_id>', methods=['PUT'])
-def add_new_alert(ref_id):
+def add_new_alert(ref_id : str):
     time = datetime.datetime.utcnow()
     alert = {
         "ref_id": ref_id,
         "created_at": time
     }
     result = db.alerts.insert_one(alert)
-    if len(ref_id) == 0:
-        response = jsonify(result)
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        return response
     return result
 
 
@@ -404,6 +402,68 @@ def get_all_alerts():
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
+
+
+"""
+adds new camera to db
+"""
+@app.route('/camera', methods=['POST'])
+def add_new_camera(*args):
+    flag = False
+    if len(args) != 0:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json("data")
+    ip = data['ip']
+    nickname = data['nickname']
+    camera = {
+        "ip" : ip,
+        "nickname" : nickname
+    }
+    result = db.cameras.insert_one(camera)
+    if flag:
+        if result is not None:
+            return "Success"
+        raise RuntimeError(result)
+    return make_response()
+
+
+"""
+given camera_id, returns camera info
+"""
+@app.route('/camera/<camera_id>', methods=['GET'])
+def get_camera_by_id(camera_id):
+    entries = []
+    cursor = db.cameras.find({"_id": ObjectId(camera_id)})
+    for document in cursor:
+        document['_id'] = str(document['_id'])
+        entries.append(document)
+    
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+"""
+returns all cameras
+"""
+@app.route('/camera', methods=['GET'])
+def get_all_cameras(*args):
+    flag = False
+    if len(args) != 0:
+        flag = True
+    entries = []
+    cursor = db.cameras.find({})
+    for document in cursor:
+        document["_id"] = str(document["_id"])
+        entries.append(document)
+    if flag:
+        return entries
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
 
 
 """

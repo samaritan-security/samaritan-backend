@@ -106,5 +106,13 @@ class ScriptTest(unittest.TestCase):
 
         self.assertEqual(i == 2, True)
 
+    
+    """
+    tests that function returns list of cameras with ip & nickname
+    """
+    def test_all_cameras(self):
+        cameras = all_cameras()
+        self.assertEqual(len(cameras) > 0 and len(cameras[0]['ip']) > 0 and len(cameras[0]['nickname']) > 0 , True)
+
 if __name__ == '__main__':
     unittest.main()

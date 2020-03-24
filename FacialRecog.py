@@ -16,7 +16,7 @@ import cv2
 import os
 import numpy as np
 
-from app import add_known_person, add_unknown_person, get_all_people
+from app import add_known_person, add_unknown_person, get_all_people, get_all_cameras
 
 
 def get_video_from_file(filename: str):
@@ -143,3 +143,11 @@ def compare_encodings(frame_encodings, all_encodings):
         encodings.append(face_recognition.compare_faces(face, frame_encodings))
 
     return encodings
+
+
+"""
+returns a list of all cameras in db
+"""
+def all_cameras():
+    cameras = get_all_cameras("not_api_call")
+    return cameras
