@@ -161,9 +161,10 @@ def get_person_by_id(id: str):
 
 """
 returns all instances of seen from s_time -> f_time
+for a specific camera
 """
-@app.route('/seen/<s_time>/<f_time>', methods=['GET'])
-def get_seen_time_interval(s_time: str, f_time: str):
+@app.route('/seen/<camera_id>/<s_time>/<f_time>', methods=['GET'])
+def get_seen_time_interval(camera_id: str, s_time: str, f_time: str):
     s_time = s_time.replace("%", " ")
     f_time = f_time.replace("%", " ")
 
@@ -172,6 +173,7 @@ def get_seen_time_interval(s_time: str, f_time: str):
 
     entries = []
     cursor = db.seen.find({
+        "camera_id": camera_id,
         "created_at": {
             "$gte": start_time,
             "$lte": end_time
@@ -344,9 +346,10 @@ def check_for_unauthorized(ref_id: str):
 
 """
 returns all alerts instances from s_time => f_time
+for a specific camera
 """
-@app.route('/alerts/<s_time>/<f_time>', methods=['GET'])
-def get_alerts_time_intervale(s_time, f_time):
+@app.route('/alerts/<camera_id>/<s_time>/<f_time>', methods=['GET'])
+def get_alerts_time_intervale(camera_id, s_time, f_time):
     s_time = s_time.replace("%", " ")
     f_time = f_time.replace("%", " ")
 
@@ -355,6 +358,7 @@ def get_alerts_time_intervale(s_time, f_time):
 
     entries = []
     cursor = db.alerts.find({
+        "camera_id": camera_id,
         "created_at": {
             "$gte": start_time,
             "$lte": end_time
