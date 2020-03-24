@@ -475,7 +475,9 @@ def delete_all_known_unknown():
     db.authorized.remove({})
     db.unauthorized.remove({})
     db.seen.remove({})
+    db.alerts.remove({})
     db.people.remove({})
+    db.cameras.remove({})
 
     return make_response()
 

@@ -179,7 +179,7 @@ def all_cameras():
 
 
 """
-given a camera from db, returns a frame 
+given a camera from db, returns a frame
 from that camera
 """
 
@@ -212,26 +212,23 @@ processes comparisons
 
 def process_comparisons(comparisons, ids, camera, frame):
     if comparisons is not None:
+        print(comparisons)
+        face_recognized = [False] * len(comparisons[0])
         for comparison in comparisons:
             if True in comparison[:len(comparison)]:
+                face_recognized[comparison.index(True)] = True
                 id = ids[comparisons.index(comparison)]
                 add_new_seen(id, str(camera['_id']))
                 check_for_alert(id, str(camera['_id']))
-            else:
-                temp_filename = "images/" + str(camera['nickname']) + ".jpg"
-                cv2.imwrite(temp_filename, frame)
-                image = cv2.imread(temp_filename)
 
-                if not detect_blurry_image(image, 200):
-
-                    unknown_encodings, unknown_images = get_images_and_encodings(
-                        frame)
-
-                    i = 0
-                    for encoding in unknown_encodings:
-                        encoded_image = base64.b64encode(
-                            np.array(unknown_images[i])).decode('utf-8')
-                        encoding_str = str(encoding[i])
-                        data = {"img": encoded_image, "npy": encoding_str}
-                        add_unknown_person(data)
-                        i = i + 1
+        unknown_encodings, unknown_images = get_images_and_encodings(frame)
+        i = 0
+        print(face_recognized)
+        for recognized in face_recognized:
+            if recognized is False:
+                encoded_image = base64.b64encode(
+                    np.array(unknown_images[i])).decode('utf-8')
+                npy_encoding = str(unknown_encodings[i])
+                data = {"img": encoded_image, "npy": npy_encoding}
+                add_unknown_person(data)
+            i = i + 1
