@@ -11,9 +11,8 @@ import cv2
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-s", "--server-ip", required=True,
-	help="ip address of the server to which the client will connect")
-ap.add_argument("-c", "--camera-ip", required=True, help="ip address of the camera on the local network to get a feed from")
+ap.add_argument("-s", "--server-ip")
+ap.add_argument("-c", "--camera-ip")
 args = vars(ap.parse_args())
 
 # initialize the ImageSender object with the socket address of the

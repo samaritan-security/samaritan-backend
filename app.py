@@ -21,17 +21,11 @@ initial endpoint for sample application
 all rendered templates need to be put in a templates folder
 """
 
-
 @app.route('/')
 def index():
     return render_template("index.html")
 
-
-"""
-returns all people
-"""
-
-
+"""returns all people"""
 @app.route('/people', methods=['GET'])
 def get_all_people(*args):
     entries = []
