@@ -15,16 +15,16 @@ Main script function
 
 
 def main():
-    # cameras = all_cameras()
-    # all_ids, all_encodings = get_all_people_information()
+    cameras = all_cameras()
+    all_ids, all_encodings = get_all_people_information()
     image_hub = imagezmq.ImageHub()
-    cameras = ['10.0.0.222']
+
     while True:
-        # for camera in cameras:
-        camera, frame = get_frame_from_camera(image_hub, cameras)
-            # comparison_results = compare_frame_and_encodings(
-            #     frame, all_encodings)
-            # process_comparisons(comparison_results, all_ids, camera, frame)
+        for camera in cameras:
+            camera_ip, frame = get_frame_from_camera(image_hub, camera)
+            comparison_results = compare_frame_and_encodings(
+                frame, all_encodings)
+            process_comparisons(comparison_results, all_ids, camera, frame)
 
 
 if __name__ == "__main__":
