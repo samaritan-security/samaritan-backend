@@ -21,7 +21,7 @@ def main():
 
     while True:
         for camera in cameras:
-            camera_ip, frame = get_frame_from_camera(image_hub, camera)
+            frame = get_frame_from_camera(image_hub, camera)
             comparison_results = compare_frame_and_encodings(
                 frame, all_encodings)
             process_comparisons(comparison_results, all_ids, camera, frame)

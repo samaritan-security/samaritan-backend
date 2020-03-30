@@ -190,7 +190,7 @@ def get_frame_from_camera(image_hub, camera):
         image_hub.send_reply(b'OK')
 
     frame = cv2.resize(img, (0, 0), fx=0.75, fy=0.75)
-    return camera_name, frame
+    return frame
 
 
 """
