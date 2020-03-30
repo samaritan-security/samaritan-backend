@@ -181,40 +181,10 @@ from that camera
 """
 
 
-def get_frame_from_camera(image_hub):
-    # Camera Streaming code:
-    # image_hub = imagezmq.ImageHub()
-
-    # initialize the dictionary which will contain  information regarding
-    # when a device was last active, then store the last time the check
-    # was made was now
-    last_active = {}
-    last_active_check = datetime.now()
+def get_frame_from_camera(image_hub, camera):
 
     camera_name, img = image_hub.recv_image()
     image_hub.send_reply(b'OK')
-
-    last_active[camera_name] = datetime.now()
-
-    # print("Frame received")
-    print("Camera Name: " + str(camera_name))
-
-    # if current time *minus* last time when the active device check was made is
-    # greater than the threshold set then do a check
-    # if (datetime.now() - last_active_check).seconds > 10:
-    #     # loop over all previously active devices
-    #     for (rpi_name, ts) in list(last_active.items()):
-    #         # remove the RPi from the last active and frame dictionaries if the
-    #         # device hasn't been active recently
-    #         if (datetime.now() - ts).seconds > 10:
-    #             print("[INFO] lost connection to {}".format(rpi_name))
-    #             last_active.pop(rpi_name)
-    #
-    #     # set the last active check time as current time
-    #     last_active_check = datetime.now()
-
-    # feed = cv2.VideoCapture("http://" + str(camera['ip']) + "/video.mjpg")
-    # ret, img = feed.read()
     frame = cv2.resize(img, (0, 0), fx=0.75, fy=0.75)
     return camera_name, frame
 
