@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.7.5" />
+<title>samaritan_documentation.FacialRecog API documentation</title>
+<meta name="description" content="Samaritan Security Facial Recognition Script Functions:
+Functions for use in RecogScript.py …" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>samaritan_documentation.FacialRecog</code></h1>
+</header>
+<section id="section-intro">
+<p>Samaritan Security Facial Recognition Script Functions:
+Functions for use in RecogScript.py</p>
+<p>SDMay20-45
+Dept. of Electrical and Computer Engineering
+Iowa State University
+Author(s): Devin Uner, Ryan Goluch, Ann Gould, Kate Brune</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#39;&#39;&#39;
+Samaritan Security Facial Recognition Script Functions:
+    Functions for use in RecogScript.py
+
+SDMay20-45
+Dept. of Electrical and Computer Engineering
+Iowa State University
+Author(s): Devin Uner, Ryan Goluch, Ann Gould, Kate Brune
+&#39;&#39;&#39;
+
+from typing import Tuple
+import face_recognition
+import cv2
+import numpy as np
+import base64
+from datetime import datetime
+import imagezmq
+from app import add_known_person, add_unknown_person, get_all_people, get_all_cameras
+from BlurDetection import detect_blurry_image
+from Alerts import check_for_alert
+from app import add_unknown_person, add_new_seen
+
+
+def get_video_from_file(filename: str):
+    &#34;&#34;&#34; Function that allows you to read in a video feed from a file. Used for testing purposes.
+
+    Parameters
+    ----------
+    filename: str
+        Name of the video file that you want to read in to test with
+    Returns
+    -------
+    type: dict
+        The &#34;camera feed&#34; that is read in from the video file
+    &#34;&#34;&#34;
+
+
+def get_camera_ip_from_file(filename: str):
+    &#34;&#34;&#34; Function that allows you to get all open video feeds from the camera IPs that are listed in the given filename
+
+    Parameters
+    ----------
+    filename: str
+        Name of the file that contains the list of camera IPs on the local network
+    Returns
+    -------
+    type: dict
+        A dictionary of camera feed objects that allow you to capture the feed from each of
+        the connected cameras
+    &#34;&#34;&#34;
+
+
+def add_camera_ip(ip: str):
+    &#34;&#34;&#34; Function to add a new camera to the text file of camera IPs
+
+    Parameters
+    ----------
+    ip: str
+        IP address of the camera that you are wanting to add to the camera.txt file
+    Returns
+    -------
+    type: bool
+        True/False based on whether or not the IP was written to the file
+    &#34;&#34;&#34;
+
+
+def scan_for_known_people_from_db(npy_known: str) -&gt; dict:
+    &#34;&#34;&#34; Gets all encoding/id pairs from people db
+
+    Parameters
+    ----------
+    npy_known: str
+        NumPy array that is passed in as a string to use in DB query
+    Returns
+    -------
+    type: dict
+        A dictionary of any faces that were detected in the passed in string
+    &#34;&#34;&#34;
+
+
+def get_all_people_information() -&gt; Tuple[list, list]:
+    &#34;&#34;&#34;
+    Queries the database for IDs and encodings of all the people in the database. All people
+    in the database consists of both known and unknown people.
+
+    Returns
+    -------
+    type: tuple
+        Returns a list of IDs and image encodings
+
+    &#34;&#34;&#34;
+
+
+def get_frame(video_feed):
+    &#34;&#34;&#34;
+    Takes in a camera video feed, reads a single frame from that feed. Then resizes the frame appropriately and returns that frame.
+    Parameters
+    ----------
+    video_feed
+        Camera video feed that you want to get a frame from for analysis
+    Returns
+    -------
+    A single, resized frame from the given video feed
+    &#34;&#34;&#34;
+
+
+&#34;&#34;&#34;
+given a frame, returns a list of nparray face encodings, shape = (128,)
+&#34;&#34;&#34;
+
+
+def get_face_encodings(frame):
+    # Convert the image from BGR color (which OpenCV uses)
+    # to RGB color (which face_recognition uses)
+    rgb_small_frame = frame[:, :, ::-1]
+
+    # Find all the faces and face encodings in the current frame of video
+    face_locations = face_recognition.face_locations(rgb_small_frame)
+    face_encodings = face_recognition.face_encodings(
+        rgb_small_frame, face_locations)
+
+    return face_encodings
+
+
+&#34;&#34;&#34;
+for getting images and encodings of unknown people from an image
+&#34;&#34;&#34;
+
+
+def get_images_and_encodings(frame) -&gt; Tuple[list, list]:
+    rgb_small_frame = frame[:, :, ::-1]
+
+    face_locations = face_recognition.face_locations(rgb_small_frame)
+    face_encodings = face_recognition.face_encodings(
+        rgb_small_frame, face_locations)
+
+    face_images = []
+    for location in face_locations:
+        y_s = location[0]
+        x_f = location[1]
+        y_f = location[2]
+        x_s = location[3]
+        crop_frame = frame[y_s:y_f, x_s:x_f]
+        face_images.append(crop_frame)
+
+    return face_encodings, face_images
+
+
+&#34;&#34;&#34;
+given a list of encodings from frame and a list of all
+system encodings, returns a list of lists of boolean values
+&#34;&#34;&#34;
+
+
+def compare_encodings(frame_encodings, all_encodings):
+    if len(frame_encodings) == 0:
+        return None
+
+    encodings = []
+    for face in all_encodings:
+        encodings.append(face_recognition.compare_faces(face, frame_encodings))
+
+    return encodings
+
+
+&#34;&#34;&#34;
+returns a list of all cameras in db
+&#34;&#34;&#34;
+
+
+def all_cameras():
+    cameras = get_all_cameras(&#34;not_api_call&#34;)
+    return cameras
+
+
+&#34;&#34;&#34;
+given a camera from db, returns a frame
+from that camera
+&#34;&#34;&#34;
+
+
+def get_frame_from_camera(image_hub, camera):
+
+    camera_name, img = image_hub.recv_image()
+    image_hub.send_reply(b&#39;OK&#39;)
+    while str(camera_name) not in str(camera[&#39;ip&#39;]):
+        camera_name, img = image_hub.recv_image()
+        image_hub.send_reply(b&#39;OK&#39;)
+
+    frame = cv2.resize(img, (0, 0), fx=0.75, fy=0.75)
+    return frame
+
+
+&#34;&#34;&#34;
+given a frame and a list of encodings,
+returns a list of comparisons between faces
+in the frame and the list of encodings
+&#34;&#34;&#34;
+
+
+def compare_frame_and_encodings(frame, encodings):
+    frame_encodings = get_face_encodings(frame)
+    comparison_results = compare_encodings(frame_encodings, encodings)
+    return comparison_results
+
+
+&#34;&#34;&#34;
+given a list of comparisons, list of ids, camera, frame,
+processes comparisons
+&#34;&#34;&#34;
+
+
+def process_comparisons(comparisons, ids, camera, frame):
+    if comparisons is not None:
+        print(comparisons)
+        face_recognized = [False] * len(comparisons[0])
+        for comparison in comparisons:
+            if True in comparison[:len(comparison)]:
+                face_recognized[comparison.index(True)] = True
+                id = ids[comparisons.index(comparison)]
+                add_new_seen(id, str(camera[&#39;_id&#39;]))
+                check_for_alert(id, str(camera[&#39;_id&#39;]))
+
+        unknown_encodings, unknown_images = get_images_and_encodings(frame)
+        i = 0
+        print(face_recognized)
+        for recognized in face_recognized:
+            if recognized is False:
+                encoded_image = base64.b64encode(
+                    np.array(unknown_images[i])).decode(&#39;utf-8&#39;)
+                npy_encoding = str(unknown_encodings[i])
+                data = {&#34;img&#34;: encoded_image, &#34;npy&#34;: npy_encoding}
+                add_unknown_person(data)
+            i = i + 1</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="samaritan_documentation.FacialRecog.add_camera_ip"><code class="name flex">
+<span>def <span class="ident">add_camera_ip</span></span>(<span>ip)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Function to add a new camera to the text file of camera IPs</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ip</code></strong> :&ensp;<code>str</code></dt>
+<dd>IP address of the camera that you are wanting to add to the camera.txt file</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>type</code></strong> :&ensp;<code>bool</code></dt>
+<dd>True/False based on whether or not the IP was written to the file</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_camera_ip(ip: str):
+    &#34;&#34;&#34; Function to add a new camera to the text file of camera IPs
+
+    Parameters
+    ----------
+    ip: str
+        IP address of the camera that you are wanting to add to the camera.txt file
+    Returns
+    -------
+    type: bool
+        True/False based on whether or not the IP was written to the file
+    &#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.all_cameras"><code class="name flex">
+<span>def <span class="ident">all_cameras</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def all_cameras():
+    cameras = get_all_cameras(&#34;not_api_call&#34;)
+    return cameras</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.compare_encodings"><code class="name flex">
+<span>def <span class="ident">compare_encodings</span></span>(<span>frame_encodings, all_encodings)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compare_encodings(frame_encodings, all_encodings):
+    if len(frame_encodings) == 0:
+        return None
+
+    encodings = []
+    for face in all_encodings:
+        encodings.append(face_recognition.compare_faces(face, frame_encodings))
+
+    return encodings</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.compare_frame_and_encodings"><code class="name flex">
+<span>def <span class="ident">compare_frame_and_encodings</span></span>(<span>frame, encodings)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compare_frame_and_encodings(frame, encodings):
+    frame_encodings = get_face_encodings(frame)
+    comparison_results = compare_encodings(frame_encodings, encodings)
+    return comparison_results</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.get_all_people_information"><code class="name flex">
+<span>def <span class="ident">get_all_people_information</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Queries the database for IDs and encodings of all the people in the database. All people
+in the database consists of both known and unknown people.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>type</code></strong> :&ensp;<code>tuple</code></dt>
+<dd>Returns a list of IDs and image encodings</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_people_information() -&gt; Tuple[list, list]:
+    &#34;&#34;&#34;
+    Queries the database for IDs and encodings of all the people in the database. All people
+    in the database consists of both known and unknown people.
+
+    Returns
+    -------
+    type: tuple
+        Returns a list of IDs and image encodings
+
+    &#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.get_camera_ip_from_file"><code class="name flex">
+<span>def <span class="ident">get_camera_ip_from_file</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Function that allows you to get all open video feeds from the camera IPs that are listed in the given filename</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of the file that contains the list of camera IPs on the local network</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>type</code></strong> :&ensp;<code>dict</code></dt>
+<dd>A dictionary of camera feed objects that allow you to capture the feed from each of
+the connected cameras</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_camera_ip_from_file(filename: str):
+    &#34;&#34;&#34; Function that allows you to get all open video feeds from the camera IPs that are listed in the given filename
+
+    Parameters
+    ----------
+    filename: str
+        Name of the file that contains the list of camera IPs on the local network
+    Returns
+    -------
+    type: dict
+        A dictionary of camera feed objects that allow you to capture the feed from each of
+        the connected cameras
+    &#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.get_face_encodings"><code class="name flex">
+<span>def <span class="ident">get_face_encodings</span></span>(<span>frame)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_face_encodings(frame):
+    # Convert the image from BGR color (which OpenCV uses)
+    # to RGB color (which face_recognition uses)
+    rgb_small_frame = frame[:, :, ::-1]
+
+    # Find all the faces and face encodings in the current frame of video
+    face_locations = face_recognition.face_locations(rgb_small_frame)
+    face_encodings = face_recognition.face_encodings(
+        rgb_small_frame, face_locations)
+
+    return face_encodings</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.get_frame"><code class="name flex">
+<span>def <span class="ident">get_frame</span></span>(<span>video_feed)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Takes in a camera video feed, reads a single frame from that feed. Then resizes the frame appropriately and returns that frame.
+Parameters</p>
+<hr>
+<dl>
+<dt><strong><code>video_feed</code></strong></dt>
+<dd>Camera video feed that you want to get a frame from for analysis</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>A</code> <code>single</code>, <code>resized</code> <code>frame</code> <code>from</code> <code>the</code> <code>given</code> <code>video</code> <code>feed</code></dt>
+<dd>&nbsp;</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_frame(video_feed):
+    &#34;&#34;&#34;
+    Takes in a camera video feed, reads a single frame from that feed. Then resizes the frame appropriately and returns that frame.
+    Parameters
+    ----------
+    video_feed
+        Camera video feed that you want to get a frame from for analysis
+    Returns
+    -------
+    A single, resized frame from the given video feed
+    &#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.get_frame_from_camera"><code class="name flex">
+<span>def <span class="ident">get_frame_from_camera</span></span>(<span>image_hub, camera)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_frame_from_camera(image_hub, camera):
+
+    camera_name, img = image_hub.recv_image()
+    image_hub.send_reply(b&#39;OK&#39;)
+    while str(camera_name) not in str(camera[&#39;ip&#39;]):
+        camera_name, img = image_hub.recv_image()
+        image_hub.send_reply(b&#39;OK&#39;)
+
+    frame = cv2.resize(img, (0, 0), fx=0.75, fy=0.75)
+    return frame</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.get_images_and_encodings"><code class="name flex">
+<span>def <span class="ident">get_images_and_encodings</span></span>(<span>frame)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_images_and_encodings(frame) -&gt; Tuple[list, list]:
+    rgb_small_frame = frame[:, :, ::-1]
+
+    face_locations = face_recognition.face_locations(rgb_small_frame)
+    face_encodings = face_recognition.face_encodings(
+        rgb_small_frame, face_locations)
+
+    face_images = []
+    for location in face_locations:
+        y_s = location[0]
+        x_f = location[1]
+        y_f = location[2]
+        x_s = location[3]
+        crop_frame = frame[y_s:y_f, x_s:x_f]
+        face_images.append(crop_frame)
+
+    return face_encodings, face_images</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.get_video_from_file"><code class="name flex">
+<span>def <span class="ident">get_video_from_file</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Function that allows you to read in a video feed from a file. Used for testing purposes.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of the video file that you want to read in to test with</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>type</code></strong> :&ensp;<code>dict</code></dt>
+<dd>The "camera feed" that is read in from the video file</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_video_from_file(filename: str):
+    &#34;&#34;&#34; Function that allows you to read in a video feed from a file. Used for testing purposes.
+
+    Parameters
+    ----------
+    filename: str
+        Name of the video file that you want to read in to test with
+    Returns
+    -------
+    type: dict
+        The &#34;camera feed&#34; that is read in from the video file
+    &#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.process_comparisons"><code class="name flex">
+<span>def <span class="ident">process_comparisons</span></span>(<span>comparisons, ids, camera, frame)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_comparisons(comparisons, ids, camera, frame):
+    if comparisons is not None:
+        print(comparisons)
+        face_recognized = [False] * len(comparisons[0])
+        for comparison in comparisons:
+            if True in comparison[:len(comparison)]:
+                face_recognized[comparison.index(True)] = True
+                id = ids[comparisons.index(comparison)]
+                add_new_seen(id, str(camera[&#39;_id&#39;]))
+                check_for_alert(id, str(camera[&#39;_id&#39;]))
+
+        unknown_encodings, unknown_images = get_images_and_encodings(frame)
+        i = 0
+        print(face_recognized)
+        for recognized in face_recognized:
+            if recognized is False:
+                encoded_image = base64.b64encode(
+                    np.array(unknown_images[i])).decode(&#39;utf-8&#39;)
+                npy_encoding = str(unknown_encodings[i])
+                data = {&#34;img&#34;: encoded_image, &#34;npy&#34;: npy_encoding}
+                add_unknown_person(data)
+            i = i + 1</code></pre>
+</details>
+</dd>
+<dt id="samaritan_documentation.FacialRecog.scan_for_known_people_from_db"><code class="name flex">
+<span>def <span class="ident">scan_for_known_people_from_db</span></span>(<span>npy_known)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Gets all encoding/id pairs from people db</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>npy_known</code></strong> :&ensp;<code>str</code></dt>
+<dd>NumPy array that is passed in as a string to use in DB query</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>type</code></strong> :&ensp;<code>dict</code></dt>
+<dd>A dictionary of any faces that were detected in the passed in string</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scan_for_known_people_from_db(npy_known: str) -&gt; dict:
+    &#34;&#34;&#34; Gets all encoding/id pairs from people db
+
+    Parameters
+    ----------
+    npy_known: str
+        NumPy array that is passed in as a string to use in DB query
+    Returns
+    -------
+    type: dict
+        A dictionary of any faces that were detected in the passed in string
+    &#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="samaritan_documentation" href="index.html">samaritan_documentation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="samaritan_documentation.FacialRecog.add_camera_ip" href="#samaritan_documentation.FacialRecog.add_camera_ip">add_camera_ip</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.all_cameras" href="#samaritan_documentation.FacialRecog.all_cameras">all_cameras</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.compare_encodings" href="#samaritan_documentation.FacialRecog.compare_encodings">compare_encodings</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.compare_frame_and_encodings" href="#samaritan_documentation.FacialRecog.compare_frame_and_encodings">compare_frame_and_encodings</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.get_all_people_information" href="#samaritan_documentation.FacialRecog.get_all_people_information">get_all_people_information</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.get_camera_ip_from_file" href="#samaritan_documentation.FacialRecog.get_camera_ip_from_file">get_camera_ip_from_file</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.get_face_encodings" href="#samaritan_documentation.FacialRecog.get_face_encodings">get_face_encodings</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.get_frame" href="#samaritan_documentation.FacialRecog.get_frame">get_frame</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.get_frame_from_camera" href="#samaritan_documentation.FacialRecog.get_frame_from_camera">get_frame_from_camera</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.get_images_and_encodings" href="#samaritan_documentation.FacialRecog.get_images_and_encodings">get_images_and_encodings</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.get_video_from_file" href="#samaritan_documentation.FacialRecog.get_video_from_file">get_video_from_file</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.process_comparisons" href="#samaritan_documentation.FacialRecog.process_comparisons">process_comparisons</a></code></li>
+<li><code><a title="samaritan_documentation.FacialRecog.scan_for_known_people_from_db" href="#samaritan_documentation.FacialRecog.scan_for_known_people_from_db">scan_for_known_people_from_db</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

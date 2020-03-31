@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.7.5" />
+<title>samaritan.models API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>samaritan.models</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from mongoengine import Document
+from mongoengine.fields import StringField
+
+
+class User(Document):
+    meta = {&#39;collection&#39;: &#39;user&#39;}
+    name = StringField(required=True)
+    image = StringField(required=True)
+    time = StringField(required=True)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="samaritan.models.User"><code class="flex name class">
+<span>class <span class="ident">User</span></span>
+<span>(</span><span>*args, **values)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The base class used for defining the structure and properties of
+collections of documents stored in MongoDB. Inherit from this class, and
+add fields as class attributes to define a document's structure.
+Individual documents may then be created by making instances of the
+:class:<code>~mongoengine.Document</code> subclass.</p>
+<p>By default, the MongoDB collection used to store documents created using a
+:class:<code>~mongoengine.Document</code> subclass will be the name of the subclass
+converted to lowercase. A different collection may be specified by
+providing :attr:<code>collection</code> to the :attr:<code>meta</code> dictionary in the class
+definition.</p>
+<p>A :class:<code>~mongoengine.Document</code> subclass may be itself subclassed, to
+create a specialised version of the document that will be stored in the
+same collection. To facilitate this behaviour a <code>_cls</code>
+field is added to documents (hidden though the MongoEngine interface).
+To enable this behaviourset :attr:<code>allow_inheritance</code> to <code>True</code> in the
+:attr:<code>meta</code> dictionary.</p>
+<p>A :class:<code>~mongoengine.Document</code> may use a <strong>Capped Collection</strong> by
+specifying :attr:<code>max_documents</code> and :attr:<code>max_size</code> in the :attr:<code>meta</code>
+dictionary. :attr:<code>max_documents</code> is the maximum number of documents that
+is allowed to be stored in the collection, and :attr:<code>max_size</code> is the
+maximum size of the collection in bytes. :attr:<code>max_size</code> is rounded up
+to the next multiple of 256 by MongoDB internally and mongoengine before.
+Use also a multiple of 256 to avoid confusions.
+If :attr:<code>max_size</code> is not
+specified and :attr:<code>max_documents</code> is, :attr:<code>max_size</code> defaults to
+10485760 bytes (10MB).</p>
+<p>Indexes may be created by specifying :attr:<code>indexes</code> in the :attr:<code>meta</code>
+dictionary. The value should be a list of field names or tuples of field
+names. Index direction may be specified by prefixing the field names with
+a <strong>+</strong> or <strong>-</strong> sign.</p>
+<p>Automatic index creation can be disabled by specifying
+:attr:<code>auto_create_index</code> in the :attr:<code>meta</code> dictionary. If this is set to
+False then indexes will not be created by MongoEngine.
+This is useful in
+production systems where index creation is performed as part of a
+deployment system.</p>
+<p>By default, _cls will be added to the start of every index (that
+doesn't contain a list) if allow_inheritance is True. This can be
+disabled by either setting cls to False on the specific index or
+by setting index_cls to False on the meta dictionary for the document.</p>
+<p>By default, any extra attribute existing in stored data but not declared
+in your model will raise a :class:<code>~mongoengine.FieldDoesNotExist</code> error.
+This can be disabled by setting :attr:<code>strict</code> to <code>False</code>
+in the :attr:<code>meta</code> dictionary.</p>
+<p>Initialise a document or an embedded document.</p>
+<p>:param values: A dictionary of keys and values for the document.
+It may contain additional reserved keywords, e.g. "__auto_convert".
+:param __auto_convert: If True, supplied values will be converted
+to Python-type values via each field's <code>to_python</code> method.
+:param __only_fields: A set of fields that have been loaded for
+this document. Empty if all fields have been loaded.
+:param _created: Indicates whether this is a brand new document
+or whether it's already been persisted before. Defaults to true.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class User(Document):
+    meta = {&#39;collection&#39;: &#39;user&#39;}
+    name = StringField(required=True)
+    image = StringField(required=True)
+    time = StringField(required=True)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>mongoengine.document.Document</li>
+<li>mongoengine.base.document.BaseDocument</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="samaritan.models.User.DoesNotExist"><code class="name">var <span class="ident">DoesNotExist</span></code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+</dd>
+<dt id="samaritan.models.User.MultipleObjectsReturned"><code class="name">var <span class="ident">MultipleObjectsReturned</span></code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+</dd>
+<dt id="samaritan.models.User.objects"><code class="name">var <span class="ident">objects</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="samaritan.models.User.id"><code class="name">var <span class="ident">id</span></code></dt>
+<dd>
+<section class="desc"><p>A field wrapper around MongoDB's ObjectIds.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;Descriptor for retrieving a value from a field in a document.
+    &#34;&#34;&#34;
+    if instance is None:
+        # Document class being used rather than a document object
+        return self
+
+    # Get value from document instance if available
+    return instance._data.get(self.name)</code></pre>
+</details>
+</dd>
+<dt id="samaritan.models.User.image"><code class="name">var <span class="ident">image</span></code></dt>
+<dd>
+<section class="desc"><p>A unicode string field.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;Descriptor for retrieving a value from a field in a document.
+    &#34;&#34;&#34;
+    if instance is None:
+        # Document class being used rather than a document object
+        return self
+
+    # Get value from document instance if available
+    return instance._data.get(self.name)</code></pre>
+</details>
+</dd>
+<dt id="samaritan.models.User.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>A unicode string field.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;Descriptor for retrieving a value from a field in a document.
+    &#34;&#34;&#34;
+    if instance is None:
+        # Document class being used rather than a document object
+        return self
+
+    # Get value from document instance if available
+    return instance._data.get(self.name)</code></pre>
+</details>
+</dd>
+<dt id="samaritan.models.User.time"><code class="name">var <span class="ident">time</span></code></dt>
+<dd>
+<section class="desc"><p>A unicode string field.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;Descriptor for retrieving a value from a field in a document.
+    &#34;&#34;&#34;
+    if instance is None:
+        # Document class being used rather than a document object
+        return self
+
+    # Get value from document instance if available
+    return instance._data.get(self.name)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="samaritan" href="index.html">samaritan</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="samaritan.models.User" href="#samaritan.models.User">User</a></code></h4>
+<ul class="">
+<li><code><a title="samaritan.models.User.DoesNotExist" href="#samaritan.models.User.DoesNotExist">DoesNotExist</a></code></li>
+<li><code><a title="samaritan.models.User.MultipleObjectsReturned" href="#samaritan.models.User.MultipleObjectsReturned">MultipleObjectsReturned</a></code></li>
+<li><code><a title="samaritan.models.User.id" href="#samaritan.models.User.id">id</a></code></li>
+<li><code><a title="samaritan.models.User.image" href="#samaritan.models.User.image">image</a></code></li>
+<li><code><a title="samaritan.models.User.name" href="#samaritan.models.User.name">name</a></code></li>
+<li><code><a title="samaritan.models.User.objects" href="#samaritan.models.User.objects">objects</a></code></li>
+<li><code><a title="samaritan.models.User.time" href="#samaritan.models.User.time">time</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

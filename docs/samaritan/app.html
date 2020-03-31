@@ -1,0 +1,1246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.7.5" />
+<title>samaritan.app API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>samaritan.app</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from flask import Flask, render_template, make_response, request, jsonify
+from pymongo import MongoClient
+import json
+from flask_graphql import GraphQLView
+from schema import schema
+import datetime
+from bson.objectid import ObjectId
+from mongoengine import connect
+import dateutil.parser
+import traceback
+
+app = Flask(__name__)
+client: MongoClient = MongoClient(&#34;localhost:27017&#34;)
+
+db = client.user  # need for non graphql routes that access db
+
+DEFAULT_CONNECTION_NAME = connect(&#39;user&#39;)  # need this for graphql
+
+&#34;&#34;&#34;
+initial endpoint for sample application
+all rendered templates need to be put in a templates folder
+&#34;&#34;&#34;
+
+@app.route(&#39;/&#39;)
+def index():
+    return render_template(&#34;index.html&#34;)
+
+&#34;&#34;&#34;returns all people&#34;&#34;&#34;
+@app.route(&#39;/people&#39;, methods=[&#39;GET&#39;])
+def get_all_people(*args):
+    entries = []
+    cursor = db.people.find({})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        document[&#39;img&#39;] = str(document[&#39;img&#39;])
+        document[&#39;npy&#39;] = str(document[&#39;npy&#39;])
+        entries.append(document)
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+        return response
+    return entries
+
+
+&#34;&#34;&#34;
+gets all known people
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/people/known&#39;, methods=[&#39;GET&#39;])
+def get_known_people(*args):
+    entries = []
+    cursor = db.people.find({&#34;known&#34;: True})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        document[&#39;img&#39;] = str(document[&#39;img&#39;])
+        document[&#39;npy&#39;] = str(document[&#39;npy&#39;])
+        entries.append(document)
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+        return response
+    return entries
+
+
+&#34;&#34;&#34;
+gets all unknown people
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/people/unknown&#39;, methods=[&#39;GET&#39;])
+def get_unknown_people(*args):
+    entries = []
+    cursor = db.people.find({&#34;known&#34;: False})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        document[&#39;img&#39;] = str(document[&#39;img&#39;])
+        document[&#39;npy&#39;] = str(document[&#39;npy&#39;])
+        entries.append(document)
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+        return response
+    return entries
+
+
+&#34;&#34;&#34;
+adds new known person
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/people/known&#39;, methods=[&#39;POST&#39;])
+def add_known_person(*args):
+    flag = False
+    if len(args) != 0:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json(&#34;data&#34;)
+    img = data[&#34;img&#34;]
+    npy = data[&#34;npy&#34;]
+    name = data[&#34;name&#34;]
+    known = True
+    person = {
+        &#34;known&#34;: known,
+        &#34;name&#34;: name,
+        &#34;img&#34;: img,
+        &#34;npy&#34;: npy
+    }
+    result = db.people.insert_one(person)
+    if flag:
+        if result is not None:
+            return &#34;Success&#34;
+        raise RuntimeError(result)
+    return make_response()
+
+
+&#34;&#34;&#34;
+adds new unknown person
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/people/unknown&#39;, methods=[&#39;POST&#39;])
+def add_unknown_person(*args):
+    flag = False
+    if len(args) != 0:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json(&#34;data&#34;)
+    img = data[&#39;img&#39;]
+    npy = data[&#39;npy&#39;]
+    known = False
+    person = {
+        &#34;known&#34;: known,
+        &#34;img&#34;: img,
+        &#34;npy&#34;: npy
+    }
+    result = db.people.insert_one(person)
+    if flag:
+        if result is not None:
+            return &#34;Success&#34;
+        raise RuntimeError(result)
+    return make_response()
+
+
+&#34;&#34;&#34;
+given id, returns person
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/people/&lt;id&gt;&#39;, methods=[&#39;GET&#39;])
+def get_person_by_id(id: str):
+    entries = []
+    cursor = db.people.find({&#34;_id&#34;: ObjectId(id)})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        document[&#39;img&#39;] = str(document[&#39;img&#39;])
+        document[&#39;npy&#39;] = str(document[&#39;npy&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response
+
+
+&#34;&#34;&#34;
+returns all instances of seen from s_time -&gt; f_time
+for a specific camera
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/seen/&lt;camera_id&gt;/&lt;s_time&gt;/&lt;f_time&gt;&#39;, methods=[&#39;GET&#39;])
+def get_seen_time_interval(camera_id: str, s_time: str, f_time: str):
+    s_time = s_time.replace(&#34;%&#34;, &#34; &#34;)
+    f_time = f_time.replace(&#34;%&#34;, &#34; &#34;)
+
+    start_time = dateutil.parser.parse(s_time)
+    end_time = dateutil.parser.parse(f_time)
+
+    entries = []
+    cursor = db.seen.find({
+        &#34;camera_id&#34;: camera_id,
+        &#34;created_at&#34;: {
+            &#34;$gte&#34;: start_time,
+            &#34;$lte&#34;: end_time
+        }})
+
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+
+    return response
+
+
+&#34;&#34;&#34;
+adds new seen
+--internal use only--
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/seen/&lt;ref_id&gt;&#39;, methods=[&#39;PUT&#39;])
+def add_new_seen(ref_id, camera_id):
+    time = datetime.datetime.now()
+    seen = {
+        &#34;ref_id&#34;: ref_id,
+        &#34;camera_id&#34;: camera_id,
+        &#34;created_at&#34;: time
+    }
+    result = db.seen.insert_one(seen)
+    return result
+
+
+&#34;&#34;&#34;
+returns all in seen
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/seen&#39;, methods=[&#39;GET&#39;])
+def get_all_seen():
+    entries = []
+    cursor = db.seen.find({})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+
+    return response
+
+
+&#34;&#34;&#34;
+adds to authorized
+returns 200 if added, 500 if duplicate id
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/authorized&#39;, methods=[&#39;POST&#39;])
+def add_authorized():
+    data = request.get_json(&#34;data&#34;)
+    ref_id = data[&#34;ref_id&#34;]
+    authorized = {
+        &#34;_id&#34;: ref_id
+    }
+    try:
+        result = db.authorized.insert_one(authorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype=&#39;application/json&#39;
+        )
+    return app.response_class(
+        status=200,
+        mimetype=&#39;application/json&#39;
+    )
+
+
+&#34;&#34;&#34;
+removes given ref_id from authorized db
+returns true if item deleted, false otherwise
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/authorized/&lt;ref_id&gt;&#39;, methods=[&#39;DELETE&#39;])
+def remove_from_authorized(ref_id):
+    result = db.authorized.delete_one({&#34;_id&#34;: ref_id})
+    response = jsonify(result.deleted_count == 1)
+    response.headers.add(&#39;Acess-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response
+
+
+&#34;&#34;&#34;
+returns all authorized user ref_ids
+(ref_id refers to the user&#39;s id in known or unknown)
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/authorized&#39;, methods=[&#39;GET&#39;])
+def get_all_authorized():
+    entries = []
+    cursor = db.authorized.find({})
+    for document in cursor:
+        document[&#34;_id&#34;] = str(document[&#34;_id&#34;])
+        entries.append(document)
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response
+
+
+&#34;&#34;&#34;
+adds to unauthorized
+returns 200 if added, 500 if duplicate id
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/unauthorized&#39;, methods=[&#39;POST&#39;])
+def add_unauthorized():
+    data = request.get_json(&#34;data&#34;)
+    ref_id = data[&#34;ref_id&#34;]
+    unauthorized = {
+        &#34;_id&#34;: ref_id
+    }
+    try:
+        result = db.unauthorized.insert_one(unauthorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype=&#39;application/json&#39;
+        )
+    return app.response_class(
+        status=200,
+        mimetype=&#39;application/json&#39;
+    )
+
+
+&#34;&#34;&#34;
+removes given ref_id from unauthorized db
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/unauthorized/&lt;ref_id&gt;&#39;, methods=[&#39;DELETE&#39;])
+def remove_from_unauthorized(ref_id):
+    result = db.unauthorized.delete_one({&#34;_id&#34;: ref_id})
+    response = jsonify(result.deleted_count == 1)
+    response.headers.add(&#39;Acess-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response
+
+
+&#34;&#34;&#34;
+returns all unauthorized user ref-ids
+(ref_id refers to the user&#39;s id in known or unknown)
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/unauthorized&#39;, methods=[&#39;GET&#39;])
+def get_all_unauthorized():
+    entries = []
+    cursor = db.unauthorized.find({})
+    for document in cursor:
+        document[&#34;_id&#34;] = str(document[&#34;_id&#34;])
+        entries.append(document)
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response
+
+
+&#34;&#34;&#34;
+checks if a ref_id exists in the unauthorized db.
+returns True if exists, False otherwise
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/unauthorized/&lt;ref_id&gt;&#39;, methods=[&#39;GET&#39;])
+def check_for_unauthorized(ref_id: str):
+    result = db.unauthorized.find({&#34;_id&#34;: ref_id})
+    result_count = result.count()
+    if result_count &lt; 1:
+        response = False
+    else:
+        response = True
+    return app.response_class(
+        response=json.dumps(response),
+        status=200,
+        mimetype=&#39;application/json&#39;
+    )
+
+
+&#34;&#34;&#34;
+returns all alerts instances from s_time =&gt; f_time
+for a specific camera
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/alerts/&lt;camera_id&gt;/&lt;s_time&gt;/&lt;f_time&gt;&#39;, methods=[&#39;GET&#39;])
+def get_alerts_time_interval(camera_id, s_time, f_time):
+    s_time = s_time.replace(&#34;%&#34;, &#34; &#34;)
+    f_time = f_time.replace(&#34;%&#34;, &#34; &#34;)
+
+    start_time = dateutil.parser.parse(s_time)
+    end_time = dateutil.parser.parse(f_time)
+
+    entries = []
+    cursor = db.alerts.find({
+        &#34;camera_id&#34;: camera_id,
+        &#34;created_at&#34;: {
+            &#34;$gte&#34;: start_time,
+            &#34;$lte&#34;: end_time
+        }})
+
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+
+    return response
+
+
+&#34;&#34;&#34;
+adds new alert
+--only accessed internally--
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/alerts/&lt;ref_id&gt;&#39;, methods=[&#39;PUT&#39;])
+def add_new_alert(ref_id: str, camera_id: str):
+    time = datetime.datetime.utcnow()
+    alert = {
+        &#34;ref_id&#34;: ref_id,
+        &#34;camera_id&#34;: camera_id,
+        &#34;created_at&#34;: time
+    }
+    result = db.alerts.insert_one(alert)
+    return result
+
+
+&#34;&#34;&#34;
+returns all alerts
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/alerts&#39;, methods=[&#39;GET&#39;])
+def get_all_alerts():
+    entries = []
+    cursor = db.alerts.find({})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+
+    return response
+
+
+&#34;&#34;&#34;
+adds new camera to db
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/camera&#39;, methods=[&#39;POST&#39;])
+def add_new_camera(*args):
+    flag = False
+    if len(args) != 0:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json(&#34;data&#34;)
+    ip = data[&#39;ip&#39;]
+    nickname = data[&#39;nickname&#39;]
+    camera = {
+        &#34;ip&#34;: ip,
+        &#34;nickname&#34;: nickname
+    }
+    result = db.cameras.insert_one(camera)
+    if flag:
+        if result is not None:
+            return &#34;Success&#34;
+        raise RuntimeError(result)
+    return make_response()
+
+
+&#34;&#34;&#34;
+given camera_id, returns camera info
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/camera/&lt;camera_id&gt;&#39;, methods=[&#39;GET&#39;])
+def get_camera_by_id(camera_id):
+    entries = []
+    cursor = db.cameras.find({&#34;_id&#34;: ObjectId(camera_id)})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response
+
+
+&#34;&#34;&#34;
+returns all cameras
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/camera&#39;, methods=[&#39;GET&#39;])
+def get_all_cameras(*args):
+    flag = False
+    if len(args) != 0:
+        flag = True
+    entries = []
+    cursor = db.cameras.find({})
+    for document in cursor:
+        document[&#34;_id&#34;] = str(document[&#34;_id&#34;])
+        entries.append(document)
+    if flag:
+        return entries
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response
+
+
+&#34;&#34;&#34;
+route to delete all known and unknown until we 
+figure it out
+
+TODO: remove this when stuff is good
+&#34;&#34;&#34;
+
+
+@app.route(&#39;/test&#39;, methods=[&#39;DELETE&#39;])
+def delete_all_known_unknown():
+    db.authorized.remove({})
+    db.unauthorized.remove({})
+    db.seen.remove({})
+    db.alerts.remove({})
+    db.people.remove({})
+    db.cameras.remove({})
+
+    return make_response()
+
+
+&#34;&#34;&#34;
+graphql route
+&#34;&#34;&#34;
+app.add_url_rule(
+    &#39;/graphql&#39;,
+    view_func=GraphQLView.as_view(
+        &#39;graphql&#39;,
+        schema=schema,
+        graphiql=True  # for having the GraphiQL interface
+    )
+)
+
+if __name__ == &#39;__main__&#39;:
+    app.run(debug=True, host=&#39;0.0.0.0&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="samaritan.app.DEFAULT_CONNECTION_NAME"><code class="name">var <span class="ident">DEFAULT_CONNECTION_NAME</span></code></dt>
+<dd>
+<section class="desc"><p>initial endpoint for sample application
+all rendered templates need to be put in a templates folder</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="samaritan.app.add_authorized"><code class="name flex">
+<span>def <span class="ident">add_authorized</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/authorized&#39;, methods=[&#39;POST&#39;])
+def add_authorized():
+    data = request.get_json(&#34;data&#34;)
+    ref_id = data[&#34;ref_id&#34;]
+    authorized = {
+        &#34;_id&#34;: ref_id
+    }
+    try:
+        result = db.authorized.insert_one(authorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype=&#39;application/json&#39;
+        )
+    return app.response_class(
+        status=200,
+        mimetype=&#39;application/json&#39;
+    )</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.add_known_person"><code class="name flex">
+<span>def <span class="ident">add_known_person</span></span>(<span>*args)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/people/known&#39;, methods=[&#39;POST&#39;])
+def add_known_person(*args):
+    flag = False
+    if len(args) != 0:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json(&#34;data&#34;)
+    img = data[&#34;img&#34;]
+    npy = data[&#34;npy&#34;]
+    name = data[&#34;name&#34;]
+    known = True
+    person = {
+        &#34;known&#34;: known,
+        &#34;name&#34;: name,
+        &#34;img&#34;: img,
+        &#34;npy&#34;: npy
+    }
+    result = db.people.insert_one(person)
+    if flag:
+        if result is not None:
+            return &#34;Success&#34;
+        raise RuntimeError(result)
+    return make_response()</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.add_new_alert"><code class="name flex">
+<span>def <span class="ident">add_new_alert</span></span>(<span>ref_id, camera_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/alerts/&lt;ref_id&gt;&#39;, methods=[&#39;PUT&#39;])
+def add_new_alert(ref_id: str, camera_id: str):
+    time = datetime.datetime.utcnow()
+    alert = {
+        &#34;ref_id&#34;: ref_id,
+        &#34;camera_id&#34;: camera_id,
+        &#34;created_at&#34;: time
+    }
+    result = db.alerts.insert_one(alert)
+    return result</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.add_new_camera"><code class="name flex">
+<span>def <span class="ident">add_new_camera</span></span>(<span>*args)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/camera&#39;, methods=[&#39;POST&#39;])
+def add_new_camera(*args):
+    flag = False
+    if len(args) != 0:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json(&#34;data&#34;)
+    ip = data[&#39;ip&#39;]
+    nickname = data[&#39;nickname&#39;]
+    camera = {
+        &#34;ip&#34;: ip,
+        &#34;nickname&#34;: nickname
+    }
+    result = db.cameras.insert_one(camera)
+    if flag:
+        if result is not None:
+            return &#34;Success&#34;
+        raise RuntimeError(result)
+    return make_response()</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.add_new_seen"><code class="name flex">
+<span>def <span class="ident">add_new_seen</span></span>(<span>ref_id, camera_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/seen/&lt;ref_id&gt;&#39;, methods=[&#39;PUT&#39;])
+def add_new_seen(ref_id, camera_id):
+    time = datetime.datetime.now()
+    seen = {
+        &#34;ref_id&#34;: ref_id,
+        &#34;camera_id&#34;: camera_id,
+        &#34;created_at&#34;: time
+    }
+    result = db.seen.insert_one(seen)
+    return result</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.add_unauthorized"><code class="name flex">
+<span>def <span class="ident">add_unauthorized</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/unauthorized&#39;, methods=[&#39;POST&#39;])
+def add_unauthorized():
+    data = request.get_json(&#34;data&#34;)
+    ref_id = data[&#34;ref_id&#34;]
+    unauthorized = {
+        &#34;_id&#34;: ref_id
+    }
+    try:
+        result = db.unauthorized.insert_one(unauthorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype=&#39;application/json&#39;
+        )
+    return app.response_class(
+        status=200,
+        mimetype=&#39;application/json&#39;
+    )</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.add_unknown_person"><code class="name flex">
+<span>def <span class="ident">add_unknown_person</span></span>(<span>*args)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/people/unknown&#39;, methods=[&#39;POST&#39;])
+def add_unknown_person(*args):
+    flag = False
+    if len(args) != 0:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json(&#34;data&#34;)
+    img = data[&#39;img&#39;]
+    npy = data[&#39;npy&#39;]
+    known = False
+    person = {
+        &#34;known&#34;: known,
+        &#34;img&#34;: img,
+        &#34;npy&#34;: npy
+    }
+    result = db.people.insert_one(person)
+    if flag:
+        if result is not None:
+            return &#34;Success&#34;
+        raise RuntimeError(result)
+    return make_response()</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.check_for_unauthorized"><code class="name flex">
+<span>def <span class="ident">check_for_unauthorized</span></span>(<span>ref_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/unauthorized/&lt;ref_id&gt;&#39;, methods=[&#39;GET&#39;])
+def check_for_unauthorized(ref_id: str):
+    result = db.unauthorized.find({&#34;_id&#34;: ref_id})
+    result_count = result.count()
+    if result_count &lt; 1:
+        response = False
+    else:
+        response = True
+    return app.response_class(
+        response=json.dumps(response),
+        status=200,
+        mimetype=&#39;application/json&#39;
+    )</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.delete_all_known_unknown"><code class="name flex">
+<span>def <span class="ident">delete_all_known_unknown</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/test&#39;, methods=[&#39;DELETE&#39;])
+def delete_all_known_unknown():
+    db.authorized.remove({})
+    db.unauthorized.remove({})
+    db.seen.remove({})
+    db.alerts.remove({})
+    db.people.remove({})
+    db.cameras.remove({})
+
+    return make_response()</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_alerts_time_interval"><code class="name flex">
+<span>def <span class="ident">get_alerts_time_interval</span></span>(<span>camera_id, s_time, f_time)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/alerts/&lt;camera_id&gt;/&lt;s_time&gt;/&lt;f_time&gt;&#39;, methods=[&#39;GET&#39;])
+def get_alerts_time_interval(camera_id, s_time, f_time):
+    s_time = s_time.replace(&#34;%&#34;, &#34; &#34;)
+    f_time = f_time.replace(&#34;%&#34;, &#34; &#34;)
+
+    start_time = dateutil.parser.parse(s_time)
+    end_time = dateutil.parser.parse(f_time)
+
+    entries = []
+    cursor = db.alerts.find({
+        &#34;camera_id&#34;: camera_id,
+        &#34;created_at&#34;: {
+            &#34;$gte&#34;: start_time,
+            &#34;$lte&#34;: end_time
+        }})
+
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_all_alerts"><code class="name flex">
+<span>def <span class="ident">get_all_alerts</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/alerts&#39;, methods=[&#39;GET&#39;])
+def get_all_alerts():
+    entries = []
+    cursor = db.alerts.find({})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_all_authorized"><code class="name flex">
+<span>def <span class="ident">get_all_authorized</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/authorized&#39;, methods=[&#39;GET&#39;])
+def get_all_authorized():
+    entries = []
+    cursor = db.authorized.find({})
+    for document in cursor:
+        document[&#34;_id&#34;] = str(document[&#34;_id&#34;])
+        entries.append(document)
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_all_cameras"><code class="name flex">
+<span>def <span class="ident">get_all_cameras</span></span>(<span>*args)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/camera&#39;, methods=[&#39;GET&#39;])
+def get_all_cameras(*args):
+    flag = False
+    if len(args) != 0:
+        flag = True
+    entries = []
+    cursor = db.cameras.find({})
+    for document in cursor:
+        document[&#34;_id&#34;] = str(document[&#34;_id&#34;])
+        entries.append(document)
+    if flag:
+        return entries
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_all_people"><code class="name flex">
+<span>def <span class="ident">get_all_people</span></span>(<span>*args)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/people&#39;, methods=[&#39;GET&#39;])
+def get_all_people(*args):
+    entries = []
+    cursor = db.people.find({})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        document[&#39;img&#39;] = str(document[&#39;img&#39;])
+        document[&#39;npy&#39;] = str(document[&#39;npy&#39;])
+        entries.append(document)
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+        return response
+    return entries</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_all_seen"><code class="name flex">
+<span>def <span class="ident">get_all_seen</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/seen&#39;, methods=[&#39;GET&#39;])
+def get_all_seen():
+    entries = []
+    cursor = db.seen.find({})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_all_unauthorized"><code class="name flex">
+<span>def <span class="ident">get_all_unauthorized</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/unauthorized&#39;, methods=[&#39;GET&#39;])
+def get_all_unauthorized():
+    entries = []
+    cursor = db.unauthorized.find({})
+    for document in cursor:
+        document[&#34;_id&#34;] = str(document[&#34;_id&#34;])
+        entries.append(document)
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_camera_by_id"><code class="name flex">
+<span>def <span class="ident">get_camera_by_id</span></span>(<span>camera_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/camera/&lt;camera_id&gt;&#39;, methods=[&#39;GET&#39;])
+def get_camera_by_id(camera_id):
+    entries = []
+    cursor = db.cameras.find({&#34;_id&#34;: ObjectId(camera_id)})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_known_people"><code class="name flex">
+<span>def <span class="ident">get_known_people</span></span>(<span>*args)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/people/known&#39;, methods=[&#39;GET&#39;])
+def get_known_people(*args):
+    entries = []
+    cursor = db.people.find({&#34;known&#34;: True})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        document[&#39;img&#39;] = str(document[&#39;img&#39;])
+        document[&#39;npy&#39;] = str(document[&#39;npy&#39;])
+        entries.append(document)
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+        return response
+    return entries</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_person_by_id"><code class="name flex">
+<span>def <span class="ident">get_person_by_id</span></span>(<span>id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/people/&lt;id&gt;&#39;, methods=[&#39;GET&#39;])
+def get_person_by_id(id: str):
+    entries = []
+    cursor = db.people.find({&#34;_id&#34;: ObjectId(id)})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        document[&#39;img&#39;] = str(document[&#39;img&#39;])
+        document[&#39;npy&#39;] = str(document[&#39;npy&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_seen_time_interval"><code class="name flex">
+<span>def <span class="ident">get_seen_time_interval</span></span>(<span>camera_id, s_time, f_time)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/seen/&lt;camera_id&gt;/&lt;s_time&gt;/&lt;f_time&gt;&#39;, methods=[&#39;GET&#39;])
+def get_seen_time_interval(camera_id: str, s_time: str, f_time: str):
+    s_time = s_time.replace(&#34;%&#34;, &#34; &#34;)
+    f_time = f_time.replace(&#34;%&#34;, &#34; &#34;)
+
+    start_time = dateutil.parser.parse(s_time)
+    end_time = dateutil.parser.parse(f_time)
+
+    entries = []
+    cursor = db.seen.find({
+        &#34;camera_id&#34;: camera_id,
+        &#34;created_at&#34;: {
+            &#34;$gte&#34;: start_time,
+            &#34;$lte&#34;: end_time
+        }})
+
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        entries.append(document)
+
+    response = jsonify(entries)
+    response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.get_unknown_people"><code class="name flex">
+<span>def <span class="ident">get_unknown_people</span></span>(<span>*args)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/people/unknown&#39;, methods=[&#39;GET&#39;])
+def get_unknown_people(*args):
+    entries = []
+    cursor = db.people.find({&#34;known&#34;: False})
+    for document in cursor:
+        document[&#39;_id&#39;] = str(document[&#39;_id&#39;])
+        document[&#39;img&#39;] = str(document[&#39;img&#39;])
+        document[&#39;npy&#39;] = str(document[&#39;npy&#39;])
+        entries.append(document)
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add(&#39;Access-Control-Allow-Origin&#39;, &#39;*&#39;)
+        return response
+    return entries</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.index"><code class="name flex">
+<span>def <span class="ident">index</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/&#39;)
+def index():
+    return render_template(&#34;index.html&#34;)</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.remove_from_authorized"><code class="name flex">
+<span>def <span class="ident">remove_from_authorized</span></span>(<span>ref_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/authorized/&lt;ref_id&gt;&#39;, methods=[&#39;DELETE&#39;])
+def remove_from_authorized(ref_id):
+    result = db.authorized.delete_one({&#34;_id&#34;: ref_id})
+    response = jsonify(result.deleted_count == 1)
+    response.headers.add(&#39;Acess-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response</code></pre>
+</details>
+</dd>
+<dt id="samaritan.app.remove_from_unauthorized"><code class="name flex">
+<span>def <span class="ident">remove_from_unauthorized</span></span>(<span>ref_id)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.route(&#39;/unauthorized/&lt;ref_id&gt;&#39;, methods=[&#39;DELETE&#39;])
+def remove_from_unauthorized(ref_id):
+    result = db.unauthorized.delete_one({&#34;_id&#34;: ref_id})
+    response = jsonify(result.deleted_count == 1)
+    response.headers.add(&#39;Acess-Control-Allow-Origin&#39;, &#39;*&#39;)
+    return response</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="samaritan" href="index.html">samaritan</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="samaritan.app.DEFAULT_CONNECTION_NAME" href="#samaritan.app.DEFAULT_CONNECTION_NAME">DEFAULT_CONNECTION_NAME</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="samaritan.app.add_authorized" href="#samaritan.app.add_authorized">add_authorized</a></code></li>
+<li><code><a title="samaritan.app.add_known_person" href="#samaritan.app.add_known_person">add_known_person</a></code></li>
+<li><code><a title="samaritan.app.add_new_alert" href="#samaritan.app.add_new_alert">add_new_alert</a></code></li>
+<li><code><a title="samaritan.app.add_new_camera" href="#samaritan.app.add_new_camera">add_new_camera</a></code></li>
+<li><code><a title="samaritan.app.add_new_seen" href="#samaritan.app.add_new_seen">add_new_seen</a></code></li>
+<li><code><a title="samaritan.app.add_unauthorized" href="#samaritan.app.add_unauthorized">add_unauthorized</a></code></li>
+<li><code><a title="samaritan.app.add_unknown_person" href="#samaritan.app.add_unknown_person">add_unknown_person</a></code></li>
+<li><code><a title="samaritan.app.check_for_unauthorized" href="#samaritan.app.check_for_unauthorized">check_for_unauthorized</a></code></li>
+<li><code><a title="samaritan.app.delete_all_known_unknown" href="#samaritan.app.delete_all_known_unknown">delete_all_known_unknown</a></code></li>
+<li><code><a title="samaritan.app.get_alerts_time_interval" href="#samaritan.app.get_alerts_time_interval">get_alerts_time_interval</a></code></li>
+<li><code><a title="samaritan.app.get_all_alerts" href="#samaritan.app.get_all_alerts">get_all_alerts</a></code></li>
+<li><code><a title="samaritan.app.get_all_authorized" href="#samaritan.app.get_all_authorized">get_all_authorized</a></code></li>
+<li><code><a title="samaritan.app.get_all_cameras" href="#samaritan.app.get_all_cameras">get_all_cameras</a></code></li>
+<li><code><a title="samaritan.app.get_all_people" href="#samaritan.app.get_all_people">get_all_people</a></code></li>
+<li><code><a title="samaritan.app.get_all_seen" href="#samaritan.app.get_all_seen">get_all_seen</a></code></li>
+<li><code><a title="samaritan.app.get_all_unauthorized" href="#samaritan.app.get_all_unauthorized">get_all_unauthorized</a></code></li>
+<li><code><a title="samaritan.app.get_camera_by_id" href="#samaritan.app.get_camera_by_id">get_camera_by_id</a></code></li>
+<li><code><a title="samaritan.app.get_known_people" href="#samaritan.app.get_known_people">get_known_people</a></code></li>
+<li><code><a title="samaritan.app.get_person_by_id" href="#samaritan.app.get_person_by_id">get_person_by_id</a></code></li>
+<li><code><a title="samaritan.app.get_seen_time_interval" href="#samaritan.app.get_seen_time_interval">get_seen_time_interval</a></code></li>
+<li><code><a title="samaritan.app.get_unknown_people" href="#samaritan.app.get_unknown_people">get_unknown_people</a></code></li>
+<li><code><a title="samaritan.app.index" href="#samaritan.app.index">index</a></code></li>
+<li><code><a title="samaritan.app.remove_from_authorized" href="#samaritan.app.remove_from_authorized">remove_from_authorized</a></code></li>
+<li><code><a title="samaritan.app.remove_from_unauthorized" href="#samaritan.app.remove_from_unauthorized">remove_from_unauthorized</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

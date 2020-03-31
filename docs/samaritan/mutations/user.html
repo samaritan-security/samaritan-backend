@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.7.5" />
+<title>samaritan.mutations.user API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>samaritan.mutations.user</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import graphene
+from schemas.user import User as UserSchema
+from models import User as UserModel
+import datetime
+
+
+class UserMutation(graphene.Mutation):
+
+    class Arguments:
+        name = graphene.String(required=True)
+        image = graphene.String(required=True)
+
+    user = graphene.Field(UserSchema)
+
+    def mutate(self, info, name, image):
+
+        if info.field_name == &#34;addUser&#34;:
+            time = datetime.datetime.now().strftime(
+                &#34;%Y-%m-%d %H:%M:%S&#34;)
+            user = UserModel(name=name, image=image, time=time)
+            user.save()
+
+        if info.field_name == &#34;deleteUser&#34;:
+            user = UserModel.objects(name=name).first()
+            user.delete()
+
+        if info.field_name == &#34;updateUser&#34;:
+            user = UserModel.objects(name=name).first()
+            user.image = image
+            user.time = datetime.datetime.now().strftime(&#34;%Y-%m-%d %H:%M:%S&#34;)
+            user.save()
+
+        return UserMutation(user=user)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="samaritan.mutations.user.UserMutation"><code class="flex name class">
+<span>class <span class="ident">UserMutation</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Object Type Definition (mutation field)</p>
+<p>Mutation is a convenience type that helps us build a Field which takes Arguments and returns a
+mutation Output ObjectType.</p>
+<div class="admonition code">
+<p class="admonition-title">Code:&ensp;python</p>
+<p>from graphene import Mutation, ObjectType, String, Boolean, Field</p>
+<p>class CreatePerson(Mutation):
+class Arguments:
+name = String()</p>
+<pre><code>ok = Boolean()
+person = Field(Person)
+
+def mutate(parent, info, name):
+    person = Person(name=name)
+    ok = True
+    return CreatePerson(person=person, ok=ok)
+</code></pre>
+<p>class Mutation(ObjectType):
+create_person = CreatePerson.Field()</p>
+</div>
+<p>Meta class options (optional):
+output (graphene.ObjectType): Or <code>Output</code> inner class with attributes on Mutation class.
+Or attributes from Mutation class. Fields which can be returned from this mutation
+field.
+resolver (Callable resolver method): Or <code>mutate</code> method on Mutation class. Perform data
+change and return output.
+arguments (Dict[str, graphene.Argument]): Or <code>Arguments</code> inner class with attributes on
+Mutation class. Arguments to use for the mutation Field.
+name (str): Name of the GraphQL type (must be unique in schema). Defaults to class
+name.
+description (str): Description of the GraphQL type in the schema. Defaults to class
+docstring.
+interfaces (Iterable[graphene.Interface]): GraphQL interfaces to extend with the payload
+object. All fields from interface will be included in this object's schema.
+fields (Dict[str, graphene.Field]): Dictionary of field name to Field. Not recommended to
+use (prefer class attributes or <code>Meta.output</code>).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class UserMutation(graphene.Mutation):
+
+    class Arguments:
+        name = graphene.String(required=True)
+        image = graphene.String(required=True)
+
+    user = graphene.Field(UserSchema)
+
+    def mutate(self, info, name, image):
+
+        if info.field_name == &#34;addUser&#34;:
+            time = datetime.datetime.now().strftime(
+                &#34;%Y-%m-%d %H:%M:%S&#34;)
+            user = UserModel(name=name, image=image, time=time)
+            user.save()
+
+        if info.field_name == &#34;deleteUser&#34;:
+            user = UserModel.objects(name=name).first()
+            user.delete()
+
+        if info.field_name == &#34;updateUser&#34;:
+            user = UserModel.objects(name=name).first()
+            user.image = image
+            user.time = datetime.datetime.now().strftime(&#34;%Y-%m-%d %H:%M:%S&#34;)
+            user.save()
+
+        return UserMutation(user=user)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>graphene.types.mutation.Mutation</li>
+<li>graphene.types.objecttype.ObjectType</li>
+<li>graphene.types.base.BaseType</li>
+<li>graphene.utils.subclass_with_meta.SubclassWithMeta</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="samaritan.mutations.user.UserMutation.Arguments"><code class="name">var <span class="ident">Arguments</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="samaritan.mutations.user.UserMutation.user"><code class="name">var <span class="ident">user</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="samaritan.mutations.user.UserMutation.mutate"><code class="name flex">
+<span>def <span class="ident">mutate</span></span>(<span>self, info, name, image)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mutate(self, info, name, image):
+
+    if info.field_name == &#34;addUser&#34;:
+        time = datetime.datetime.now().strftime(
+            &#34;%Y-%m-%d %H:%M:%S&#34;)
+        user = UserModel(name=name, image=image, time=time)
+        user.save()
+
+    if info.field_name == &#34;deleteUser&#34;:
+        user = UserModel.objects(name=name).first()
+        user.delete()
+
+    if info.field_name == &#34;updateUser&#34;:
+        user = UserModel.objects(name=name).first()
+        user.image = image
+        user.time = datetime.datetime.now().strftime(&#34;%Y-%m-%d %H:%M:%S&#34;)
+        user.save()
+
+    return UserMutation(user=user)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="samaritan.mutations" href="index.html">samaritan.mutations</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="samaritan.mutations.user.UserMutation" href="#samaritan.mutations.user.UserMutation">UserMutation</a></code></h4>
+<ul class="">
+<li><code><a title="samaritan.mutations.user.UserMutation.Arguments" href="#samaritan.mutations.user.UserMutation.Arguments">Arguments</a></code></li>
+<li><code><a title="samaritan.mutations.user.UserMutation.mutate" href="#samaritan.mutations.user.UserMutation.mutate">mutate</a></code></li>
+<li><code><a title="samaritan.mutations.user.UserMutation.user" href="#samaritan.mutations.user.UserMutation.user">user</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
