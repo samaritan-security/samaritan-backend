@@ -14,7 +14,6 @@ app = Flask(__name__)
 client: MongoClient = MongoClient("localhost:27017")
 
 db = client.user  # need for non graphql routes that access db
-cdb = client.users # need for non graphql routes that access db
 
 DEFAULT_CONNECTION_NAME = connect('user')  # need this for graphql
 
@@ -500,7 +499,7 @@ def create_login(*args):
         data = request.get_json("data")
     password = data["password"]
     username = data["username"]
-    cursor = cdb.people.find({"username": username})
+    cursor = db.company.find({"username": username})
     count = 0
     for document in cursor:
         if document["username"] == str(document["username"]):
@@ -519,7 +518,7 @@ def create_login(*args):
         "username": username,
         "password": hashed,
     }
-    result = cdb.people.insert_one(person)
+    result = db.company.insert_one(person)
     if flag:
         if result is not None:
             return "Success"
@@ -535,15 +534,21 @@ def login(*args):
     data = request.get_json("data")
     password = data["password"]
     username = data["username"]
-    cursor = cdb.people.find({"username": username})
+    cursor = db.company.find({"username": username})
     encode = password.encode('utf-8')
     for document in cursor:
         hashed = document["password"]
         result =  bcrypt.checkpw(encode, hashed)
     if result:
-        entries.append("200")
+        return app.response_class(
+            status=200,
+            mimetype='application/json'
+        )
     else:
-        entries.append("400")
+        return app.response_class(
+            status=401,
+            mimetype='application/json'
+        )
     response = jsonify(entries)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
@@ -554,7 +559,7 @@ returns all company usernames FOR DEBUGGING
 @app.route('/users/list', methods=['GET'])
 def get_all_companies(*args):
     entries = []
-    cursor = cdb.people.find({})
+    cursor = db.company.find({})
     for document in cursor:
         document['username'] = str(document['username'])
         entries.append(str(document))
@@ -573,7 +578,7 @@ TODO: remove this when stuff is good
 """
 @app.route('/logins/remove', methods=['DELETE'])
 def delete_all_logins():
-    cdb.people.remove({})
+    db.company.remove({})
     return make_response()
 
 """

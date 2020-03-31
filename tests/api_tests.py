@@ -141,6 +141,16 @@ class APITest(unittest.TestCase):
         result = self.app.get(route)
         self.assertEquals(result.status_code, 200)
 
+    def test_login(self):
+        route = "/users/login"
+        result = self.app.get(route)
+        self.assertEquals(result.status_code, 200)
+
+    def test_(self):
+        route = "/users"
+        result = self.app.get(route)
+        self.assertEquals(result.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()
