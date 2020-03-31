@@ -4,8 +4,6 @@ from graphene.relay import Node
 
 from schemas.user import User as UserSchema
 from mutations.user import UserMutation
-from schemas.users import Users as UsersSchema
-from mutations.users import UsersMutation
 
 
 class Query(ObjectType):
@@ -19,14 +17,5 @@ class Mutation(ObjectType):
     delete_user = UserMutation.Field()
     update_user = UserMutation.Field()
 
-class CompanyQuery(ObjectType):
-    node = Node.Field()
-    all_users = MongoengineConnectionField(UsersSchema)
-    user = Field(UsersSchema)
-
-class CompanyMutation(ObjectType):
-    add_user = UsersMutation.Field()
-    delete_user = UsersMutation.Field()
-    update_user = UsersMutation.Field()
 
 schema = Schema(query=Query, types=[UserSchema], mutation=Mutation)

@@ -142,14 +142,18 @@ class APITest(unittest.TestCase):
         self.assertEquals(result.status_code, 200)
 
     def test_login(self):
-        route = "/users/login"
-        result = self.app.get(route)
-        self.assertEquals(result.status_code, 200)
+        data = {"username" : "johndoe",
+                "password": "passWord"}
+        result = self.app.post(
+            "/users/login", data=json.dumps(data), content_type="application/json")
+        self.assertEqual(result.status_code, 200)
 
-    def test_(self):
-        route = "/users"
-        result = self.app.get(route)
-        self.assertEquals(result.status_code, 200)
+    def test_create_login(self):
+        data = {"username" : "johndoe",
+                "password": "passWord"}
+        result = self.app.post(
+            "/users", data=json.dumps(data), content_type="application/json")
+        self.assertEqual(result.status_code, 200)
 
 
 if __name__ == '__main__':
