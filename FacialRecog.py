@@ -8,15 +8,13 @@ Iowa State University
 Author(s): Devin Uner, Ryan Goluch, Ann Gould
 '''
 
-import re
 from typing import Tuple
-
 import face_recognition
 import cv2
-import os
 import numpy as np
 import base64
-
+from datetime import datetime
+import imagezmq
 from app import add_known_person, add_unknown_person, get_all_people, get_all_cameras
 from BlurDetection import detect_blurry_image
 from Alerts import check_for_alert
@@ -64,7 +62,6 @@ gets all encoding/id pairs from people db
 
 
 def scan_for_known_people_from_db(npy_known: str) -> dict:
-
     all_people, all_encodings = get_all_people_information()
     all_encodings = np.array(all_encodings)
     npy_array = np.array(npy_known)
@@ -184,9 +181,14 @@ from that camera
 """
 
 
-def get_frame_from_camera(camera):
-    feed = cv2.VideoCapture("http://" + str(camera['ip']) + "/video.mjpg")
-    ret, img = feed.read()
+def get_frame_from_camera(image_hub, camera):
+
+    camera_name, img = image_hub.recv_image()
+    image_hub.send_reply(b'OK')
+    while str(camera_name) not in str(camera['ip']):
+        camera_name, img = image_hub.recv_image()
+        image_hub.send_reply(b'OK')
+
     frame = cv2.resize(img, (0, 0), fx=0.75, fy=0.75)
     return frame
 
