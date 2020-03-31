@@ -407,6 +407,76 @@ def get_all_alerts():
 
     return response
 
+"""
+add _id to authorized, if _id exists in unauthorized remove it
+"""
+@app.route('/actions/authorize/<id>', methods=['GET'])
+def authorize(id):
+    ref_id = id
+    authorized = {
+        "_id": ref_id
+    }
+    try:
+        result = db.authorized.insert_one(authorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype='application/json'
+        )
+    result = db.unauthorized.find({"_id": ref_id})
+    result_count = result.count()
+    if result_count >= 1:
+        result = db.unauthorized.delete_one({"_id" : ref_id})
+        response = jsonify(result.deleted_count == 1)
+        response.headers.add('Acess-Control-Allow-Origin', '*')
+    return make_response()
+    
+"""
+add _id to unauthorized, if _id exists in authorized remove it
+"""
+@app.route('/actions/unauthorize/<id>', methods=['GET'])
+def unauthorize(id):
+    ref_id = str(id)
+    unauthorized = {
+        "_id": ref_id
+    }
+    try:
+        result = db.unauthorized.insert_one(unauthorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype='application/json'
+        )
+    result = db.authorized.find({"_id": ref_id})
+    result_count = result.count()
+    if result_count >= 1:
+        result = db.authorized.delete_one({"_id" : ref_id})
+        response = jsonify(result.deleted_count == 1)
+        response.headers.add('Acess-Control-Allow-Origin', '*')
+    return make_response()
+
+"""
+make an unknown known and add a name
+"""
+@app.route('/actions/makeknown', methods=['POST'])
+def make_known():
+    data = request.get_json("data")
+    name = data["name"]
+    _id = data["_id"]
+    _id = ObjectId(_id)   
+    cursor = db.people.find({"known" : False})
+    for document in cursor:
+        person = {
+            "_id": _id,
+            "known" : True,
+            "name" : name,
+            "img" : document["img"],
+            "npy" : document["npy"]
+        }
+        db.people.delete_one({"_id" : _id})
+        result = db.people.insert_one(person)
+
+    return make_response()
 
 """
 adds new camera to db
