@@ -7,3 +7,4 @@ class User(Document):
     name = StringField(required=True)
     image = StringField(required=True)
     time = StringField(required=True)
+

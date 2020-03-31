@@ -7,6 +7,7 @@ import datetime
 from bson.objectid import ObjectId
 from mongoengine import connect
 import dateutil.parser
+import bcrypt
 import traceback
 
 app = Flask(__name__)
@@ -485,6 +486,100 @@ def delete_all_known_unknown():
 
     return make_response()
 
+"""
+create a new log in with a given username and password
+"""
+@app.route('/users', methods=['POST']) #TODO
+def create_login(*args):
+    flag = False
+    if len(args) != 0:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json("data")
+    password = data["password"]
+    username = data["username"]
+    cursor = db.company.find({"username": username})
+    count = 0
+    for document in cursor:
+        if document["username"] == str(document["username"]):
+            count = count + 1
+    if count != 0:
+        print("username taken")
+        return make_response()
+
+    encode = password.encode('utf-8')
+    hashed = bcrypt.hashpw(encode, bcrypt.gensalt())
+    if bcrypt.checkpw(encode, hashed) != 1:
+        print("encryption failed")
+        return make_response()
+
+    person = {
+        "username": username,
+        "password": hashed,
+    }
+    result = db.company.insert_one(person)
+    if flag:
+        if result is not None:
+            return "Success"
+        raise RuntimeError(result)
+    return make_response()
+
+"""
+Login using a given username and password
+"""
+@app.route('/users/login', methods=['POST']) #TODO
+def login(*args):
+    entries = []
+    data = request.get_json("data")
+    password = data["password"]
+    username = data["username"]
+    cursor = db.company.find({"username": username})
+    encode = password.encode('utf-8')
+    for document in cursor:
+        hashed = document["password"]
+        result =  bcrypt.checkpw(encode, hashed)
+    if result:
+        return app.response_class(
+            status=200,
+            mimetype='application/json'
+        )
+    else:
+        return app.response_class(
+            status=401,
+            mimetype='application/json'
+        )
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+"""
+returns all company usernames FOR DEBUGGING
+"""
+@app.route('/users/list', methods=['GET'])
+def get_all_companies(*args):
+    entries = []
+    cursor = db.company.find({})
+    for document in cursor:
+        document['username'] = str(document['username'])
+        entries.append(str(document))
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return entries
+
+"""
+route to delete all company logins until we 
+figure it out
+
+TODO: remove this when stuff is good
+"""
+@app.route('/logins/remove', methods=['DELETE'])
+def delete_all_logins():
+    db.company.remove({})
+    return make_response()
 
 """
 graphql route
