@@ -105,68 +105,37 @@ def get_frame(video_feed):
     """
 
 
-"""
-given a frame, returns a list of nparray face encodings, shape = (128,)
-"""
-
-
 def get_face_encodings(frame):
     """
-
+    Takes in a frame, attempts to find any faces within the frame and then returns
+    any found frames
 
     Parameters
     ----------
     frame
+        Frame from video feed that you want analyzed
 
     Returns
     -------
-
+    type: list
+        List of nparray face encodings, shape = (128,)
     """
-    # Convert the image from BGR color (which OpenCV uses)
-    # to RGB color (which face_recognition uses)
-    rgb_small_frame = frame[:, :, ::-1]
-
-    # Find all the faces and face encodings in the current frame of video
-    face_locations = face_recognition.face_locations(rgb_small_frame)
-    face_encodings = face_recognition.face_encodings(
-        rgb_small_frame, face_locations)
-
-    return face_encodings
-
-
-"""
-for getting images and encodings of unknown people from an image
-"""
 
 
 def get_images_and_encodings(frame) -> Tuple[list, list]:
     """
-
+    Used to get images and encodings of unknown people from an image
 
     Parameters
     ----------
     frame
+        Image or frame to get encodings from. Should be a frame from a cv2 feed that is being read
 
     Returns
     -------
-
+    type: tuple[list, list]
+        Returns two lists. The first is a list of all the face encodings and the second is a list of the face images
     """
-    rgb_small_frame = frame[:, :, ::-1]
-
-    face_locations = face_recognition.face_locations(rgb_small_frame)
-    face_encodings = face_recognition.face_encodings(
-        rgb_small_frame, face_locations)
-
-    face_images = []
-    for location in face_locations:
-        y_s = location[0]
-        x_f = location[1]
-        y_f = location[2]
-        x_s = location[3]
-        crop_frame = frame[y_s:y_f, x_s:x_f]
-        face_images.append(crop_frame)
-
-    return face_encodings, face_images
 
 
 """
@@ -177,42 +146,34 @@ system encodings, returns a list of lists of boolean values
 
 def compare_encodings(frame_encodings, all_encodings):
     """
-
+    Takes in a list of face encodings from a frame as well as all the encodings to compare against. All encodings is
+    typically all of the encodings stored locally or in a database. Then determines if the face encodings from the frame
+    are known or not in comparison to all the encodings.
 
     Parameters
     ----------
     frame_encodings
+        List of face encodings from a frame read in from a video source
     all_encodings
+        List of all face encodings to compare against
 
     Returns
     -------
-
+    type: list
+        Returns a list of booleans (True/False) values based on whether or not each face in the frame encodings list
+        is found in the all encodings list
     """
-    if len(frame_encodings) == 0:
-        return None
-
-    encodings = []
-    for face in all_encodings:
-        encodings.append(face_recognition.compare_faces(face, frame_encodings))
-
-    return encodings
-
-
-"""
-returns a list of all cameras in db
-"""
 
 
 def all_cameras():
     """
-
+    Used to retrieve information on all the cameras that are stored in the database
 
     Returns
     -------
-
+    type: list
+        Returns a list of all the cameras in stored in the database
     """
-    cameras = get_all_cameras("not_api_call")
-    return cameras
 
 
 """
@@ -264,6 +225,24 @@ processes comparisons
 
 
 def process_comparisons(comparisons, ids, camera, frame):
+    """
+
+
+    Parameters
+    ----------
+    comparisons
+
+    ids
+
+    camera
+
+    frame
+
+    Returns
+    -------
+
+
+    """
     if comparisons is not None:
         print(comparisons)
         face_recognized = [False] * len(comparisons[0])
