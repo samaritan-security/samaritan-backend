@@ -13,10 +13,7 @@ import face_recognition
 import cv2
 import numpy as np
 import base64
-from datetime import datetime
-import imagezmq
-from app import add_known_person, add_unknown_person, get_all_people, get_all_cameras
-from BlurDetection import detect_blurry_image
+from app import get_all_people, get_all_cameras
 from Alerts import check_for_alert
 from app import add_unknown_person, add_new_seen
 
