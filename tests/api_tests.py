@@ -118,7 +118,7 @@ class APITest(unittest.TestCase):
 
     def test_add_new_alert(self):
         result = add_new_alert("5e545bcbd541d79f9ef5b0c7",
-                               "5e795368354d37c78043626e")
+                               "5e795368354d37c78043626e", "rgoluch@iastate.edu")
         self.assertEqual(result.acknowledged, True)
 
     def test_get_all_alerts(self):

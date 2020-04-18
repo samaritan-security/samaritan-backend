@@ -25,6 +25,8 @@ DEFAULT_CONNECTION_NAME = connect('user')  # need this for graphql
 initial endpoint for sample application
 all rendered templates need to be put in a templates folder
 """
+
+
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -33,6 +35,7 @@ def index():
 """
 returns all people
 """
+
 
 @app.route('/people', methods=['GET'])
 def get_all_people(*args):
@@ -54,6 +57,8 @@ def get_all_people(*args):
 """
 gets all known people
 """
+
+
 @app.route('/people/known', methods=['GET'])
 def get_known_people(*args):
     entries = []
@@ -74,6 +79,8 @@ def get_known_people(*args):
 """
 gets all unknown people
 """
+
+
 @app.route('/people/unknown', methods=['GET'])
 def get_unknown_people(*args):
     entries = []
@@ -94,6 +101,8 @@ def get_unknown_people(*args):
 """
 adds new known person
 """
+
+
 @app.route('/people/known', methods=['POST'])
 def add_known_person(*args):
     flag = False
@@ -123,6 +132,8 @@ def add_known_person(*args):
 """
 adds new unknown person
 """
+
+
 @app.route('/people/unknown', methods=['POST'])
 def add_unknown_person(*args):
     flag = False
@@ -150,6 +161,8 @@ def add_unknown_person(*args):
 """
 given id, returns person
 """
+
+
 @app.route('/people/<id>', methods=['GET'])
 def get_person_by_id(id: str):
     entries = []
@@ -169,6 +182,8 @@ def get_person_by_id(id: str):
 returns all instances of seen from s_time -> f_time
 for a specific camera
 """
+
+
 @app.route('/seen/<camera_id>/<s_time>/<f_time>', methods=['GET'])
 def get_seen_time_interval(camera_id: str, s_time: str, f_time: str):
     s_time = s_time.replace("%", " ")
@@ -199,6 +214,8 @@ def get_seen_time_interval(camera_id: str, s_time: str, f_time: str):
 adds new seen
 --internal use only--
 """
+
+
 @app.route('/seen/<ref_id>', methods=['PUT'])
 def add_new_seen(ref_id, camera_id):
     time = datetime.datetime.now()
@@ -214,6 +231,8 @@ def add_new_seen(ref_id, camera_id):
 """
 returns all in seen
 """
+
+
 @app.route('/seen', methods=['GET'])
 def get_all_seen():
     entries = []
@@ -232,6 +251,8 @@ def get_all_seen():
 adds to authorized
 returns 200 if added, 500 if duplicate id
 """
+
+
 @app.route('/authorized', methods=['POST'])
 def add_authorized():
     data = request.get_json("data")
@@ -256,6 +277,8 @@ def add_authorized():
 removes given ref_id from authorized db
 returns true if item deleted, false otherwise
 """
+
+
 @app.route('/authorized/<ref_id>', methods=['DELETE'])
 def remove_from_authorized(ref_id):
     result = db.authorized.delete_one({"_id": ref_id})
@@ -268,6 +291,8 @@ def remove_from_authorized(ref_id):
 returns all authorized user ref_ids
 (ref_id refers to the user's id in known or unknown)
 """
+
+
 @app.route('/authorized', methods=['GET'])
 def get_all_authorized():
     entries = []
@@ -284,6 +309,8 @@ def get_all_authorized():
 adds to unauthorized
 returns 200 if added, 500 if duplicate id
 """
+
+
 @app.route('/unauthorized', methods=['POST'])
 def add_unauthorized():
     data = request.get_json("data")
@@ -307,6 +334,8 @@ def add_unauthorized():
 """
 removes given ref_id from unauthorized db
 """
+
+
 @app.route('/unauthorized/<ref_id>', methods=['DELETE'])
 def remove_from_unauthorized(ref_id):
     result = db.unauthorized.delete_one({"_id": ref_id})
@@ -319,6 +348,8 @@ def remove_from_unauthorized(ref_id):
 returns all unauthorized user ref-ids
 (ref_id refers to the user's id in known or unknown)
 """
+
+
 @app.route('/unauthorized', methods=['GET'])
 def get_all_unauthorized():
     entries = []
@@ -335,6 +366,8 @@ def get_all_unauthorized():
 checks if a ref_id exists in the unauthorized db.
 returns True if exists, False otherwise
 """
+
+
 @app.route('/unauthorized/<ref_id>', methods=['GET'])
 def check_for_unauthorized(ref_id: str):
     result = db.unauthorized.find({"_id": ref_id})
@@ -354,6 +387,8 @@ def check_for_unauthorized(ref_id: str):
 returns all alerts instances from s_time => f_time
 for a specific camera
 """
+
+
 @app.route('/alerts/<camera_id>/<s_time>/<f_time>', methods=['GET'])
 def get_alerts_time_interval(camera_id, s_time, f_time):
     s_time = s_time.replace("%", " ")
@@ -385,6 +420,7 @@ adds new alert
 --only accessed internally--
 """
 
+
 @app.route('/alerts/<ref_id>/<email>', methods=['PUT'])
 def add_new_alert(ref_id: str, camera_id: str, email: str):
     time = datetime.datetime.utcnow()
@@ -404,6 +440,8 @@ def add_new_alert(ref_id: str, camera_id: str, email: str):
 """
 returns all alerts
 """
+
+
 @app.route('/alerts', methods=['GET'])
 def get_all_alerts():
     entries = []
@@ -421,6 +459,8 @@ def get_all_alerts():
 """
 add _id to authorized, if _id exists in unauthorized remove it
 """
+
+
 @app.route('/actions/authorize/<id>', methods=['GET'])
 def authorize(id):
     ref_id = id
@@ -446,6 +486,8 @@ def authorize(id):
 """
 add _id to unauthorized, if _id exists in authorized remove it
 """
+
+
 @app.route('/actions/unauthorize/<id>', methods=['GET'])
 def unauthorize(id):
     ref_id = str(id)
@@ -471,6 +513,8 @@ def unauthorize(id):
 """
 make an unknown known and add a name
 """
+
+
 @app.route('/actions/makeknown', methods=['POST'])
 def make_known():
     data = request.get_json("data")
@@ -495,6 +539,8 @@ def make_known():
 """
 adds new camera to db
 """
+
+
 @app.route('/camera', methods=['POST'])
 def add_new_camera(*args):
     flag = False
@@ -520,6 +566,8 @@ def add_new_camera(*args):
 """
 given camera_id, returns camera info
 """
+
+
 @app.route('/camera/<camera_id>', methods=['GET'])
 def get_camera_by_id(camera_id):
     entries = []
@@ -536,6 +584,8 @@ def get_camera_by_id(camera_id):
 """
 returns all cameras
 """
+
+
 @app.route('/camera', methods=['GET'])
 def get_all_cameras(*args):
     flag = False
@@ -559,6 +609,8 @@ figure it out
 
 TODO: remove this when stuff is good
 """
+
+
 @app.route('/test', methods=['DELETE'])
 def delete_all_known_unknown():
     db.authorized.remove({})
@@ -574,6 +626,8 @@ def delete_all_known_unknown():
 """
 create a new log in with a given username and password
 """
+
+
 @app.route('/users', methods=['POST'])  # TODO
 def create_login(*args):
     flag = False
@@ -614,6 +668,8 @@ def create_login(*args):
 """
 Login using a given username and password
 """
+
+
 @app.route('/users/login', methods=['POST'])  # TODO
 def login(*args):
     entries = []
@@ -643,6 +699,8 @@ def login(*args):
 """
 returns all company usernames FOR DEBUGGING
 """
+
+
 @app.route('/users/list', methods=['GET'])
 def get_all_companies(*args):
     entries = []
@@ -664,6 +722,8 @@ figure it out
 
 TODO: remove this when stuff is good
 """
+
+
 @app.route('/logins/remove', methods=['DELETE'])
 def delete_all_logins():
     db.company.remove({})

@@ -9,9 +9,12 @@ import datetime
 from bson.objectid import ObjectId
 from mongoengine import connect
 import dateutil.parser
+import bcrypt
 import traceback
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 client: MongoClient = MongoClient("localhost:27017")
 
 db = client.user  # need for non graphql routes that access db
@@ -29,7 +32,9 @@ def index():
     return render_template("index.html")
 
 
-"""returns all people"""
+"""
+returns all people
+"""
 
 
 @app.route('/people', methods=['GET'])
@@ -452,6 +457,86 @@ def get_all_alerts():
 
 
 """
+add _id to authorized, if _id exists in unauthorized remove it
+"""
+
+
+@app.route('/actions/authorize/<id>', methods=['GET'])
+def authorize(id):
+    ref_id = id
+    authorized = {
+        "_id": ref_id
+    }
+    try:
+        result = db.authorized.insert_one(authorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype='application/json'
+        )
+    result = db.unauthorized.find({"_id": ref_id})
+    result_count = result.count()
+    if result_count >= 1:
+        result = db.unauthorized.delete_one({"_id": ref_id})
+        response = jsonify(result.deleted_count == 1)
+        response.headers.add('Acess-Control-Allow-Origin', '*')
+    return make_response()
+
+
+"""
+add _id to unauthorized, if _id exists in authorized remove it
+"""
+
+
+@app.route('/actions/unauthorize/<id>', methods=['GET'])
+def unauthorize(id):
+    ref_id = str(id)
+    unauthorized = {
+        "_id": ref_id
+    }
+    try:
+        result = db.unauthorized.insert_one(unauthorized)
+    except:
+        return app.response_class(
+            status=500,
+            mimetype='application/json'
+        )
+    result = db.authorized.find({"_id": ref_id})
+    result_count = result.count()
+    if result_count >= 1:
+        result = db.authorized.delete_one({"_id": ref_id})
+        response = jsonify(result.deleted_count == 1)
+        response.headers.add('Acess-Control-Allow-Origin', '*')
+    return make_response()
+
+
+"""
+make an unknown known and add a name
+"""
+
+
+@app.route('/actions/makeknown', methods=['POST'])
+def make_known():
+    data = request.get_json("data")
+    name = data["name"]
+    _id = data["_id"]
+    _id = ObjectId(_id)
+    cursor = db.people.find({"known": False})
+    for document in cursor:
+        person = {
+            "_id": _id,
+            "known": True,
+            "name": name,
+            "img": document["img"],
+            "npy": document["npy"]
+        }
+        db.people.delete_one({"_id": _id})
+        result = db.people.insert_one(person)
+
+    return make_response()
+
+
+"""
 adds new camera to db
 """
 
@@ -539,6 +624,113 @@ def delete_all_known_unknown():
 
 
 """
+create a new log in with a given username and password
+"""
+
+
+@app.route('/users', methods=['POST'])  # TODO
+def create_login(*args):
+    flag = False
+    if len(args) != 0:
+        data = args[0]
+        flag = True
+    else:
+        data = request.get_json("data")
+    password = data["password"]
+    username = data["username"]
+    cursor = db.company.find({"username": username})
+    count = 0
+    for document in cursor:
+        if document["username"] == str(document["username"]):
+            count = count + 1
+    if count != 0:
+        print("username taken")
+        return make_response()
+
+    encode = password.encode('utf-8')
+    hashed = bcrypt.hashpw(encode, bcrypt.gensalt())
+    if bcrypt.checkpw(encode, hashed) != 1:
+        print("encryption failed")
+        return make_response()
+
+    person = {
+        "username": username,
+        "password": hashed,
+    }
+    result = db.company.insert_one(person)
+    if flag:
+        if result is not None:
+            return "Success"
+        raise RuntimeError(result)
+    return make_response()
+
+
+"""
+Login using a given username and password
+"""
+
+
+@app.route('/users/login', methods=['POST'])  # TODO
+def login(*args):
+    entries = []
+    data = request.get_json("data")
+    password = data["password"]
+    username = data["username"]
+    cursor = db.company.find({"username": username})
+    encode = password.encode('utf-8')
+    for document in cursor:
+        hashed = document["password"]
+        result = bcrypt.checkpw(encode, hashed)
+    if result:
+        return app.response_class(
+            status=200,
+            mimetype='application/json'
+        )
+    else:
+        return app.response_class(
+            status=401,
+            mimetype='application/json'
+        )
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
+"""
+returns all company usernames FOR DEBUGGING
+"""
+
+
+@app.route('/users/list', methods=['GET'])
+def get_all_companies(*args):
+    entries = []
+    cursor = db.company.find({})
+    for document in cursor:
+        document['username'] = str(document['username'])
+        entries.append(str(document))
+
+    if len(args) == 0:
+        response = jsonify(entries)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    return entries
+
+
+"""
+route to delete all company logins until we 
+figure it out
+
+TODO: remove this when stuff is good
+"""
+
+
+@app.route('/logins/remove', methods=['DELETE'])
+def delete_all_logins():
+    db.company.remove({})
+    return make_response()
+
+
+"""
 graphql route
 """
 app.add_url_rule(
@@ -551,4 +743,4 @@ app.add_url_rule(
 )
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
