@@ -46,8 +46,9 @@ def get_camera_ip_from_file(filename: str):
     video_feed = []
     with open(filename, "r") as file:
         ip = file.readline()
-        video_feed.append(cv2.VideoCapture(
-            "http://" + str(ip).replace("\n", "") + "/video.mjpg"))
+        video_feed.append(ip)
+        # video_feed.append(cv2.VideoCapture(
+        #     "http://" + str(ip).replace("\n", "") + "/video.mjpg"))
     file.close()
     return video_feed
 

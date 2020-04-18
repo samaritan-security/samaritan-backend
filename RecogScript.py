@@ -7,7 +7,8 @@ Iowa State University
 Author(s): Devin Uner, Ryan Goluch, Ann Gould
 """
 
-from FacialRecog import all_cameras, get_all_people_information, get_frame_from_camera, compare_frame_and_encodings, process_comparisons
+from FacialRecog import all_cameras, get_all_people_information, get_frame_from_camera, compare_frame_and_encodings, \
+    process_comparisons, get_camera_ip_from_file
 import imagezmq
 '''
 Main script function
@@ -15,7 +16,8 @@ Main script function
 
 
 def main():
-    cameras = all_cameras()
+    cameras = get_camera_ip_from_file("camera_ip.txt")
+        # all_cameras()
     all_ids, all_encodings = get_all_people_information()
     image_hub = imagezmq.ImageHub()
 
