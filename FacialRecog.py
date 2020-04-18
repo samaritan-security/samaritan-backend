@@ -197,6 +197,7 @@ from that camera
 def get_frame_from_camera(image_hub, camera):
 
     camera_name, img = image_hub.recv_image()
+    print(camera_name)
     if str(camera_name) != str(camera):
         image_hub.send_reply(b'Not OK')
         return None
