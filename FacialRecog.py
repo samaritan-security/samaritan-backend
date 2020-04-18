@@ -197,7 +197,7 @@ from that camera
 def get_frame_from_camera(image_hub, camera):
 
     camera_name, img = image_hub.recv_image()
-    if camera_name not in camera['ip']:
+    if str(camera_name) not in str(camera['ip']):
         return None
 
     print("Camera IP:" +str(camera_name))
