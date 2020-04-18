@@ -199,7 +199,7 @@ def get_frame_from_camera(image_hub, camera):
     camera_name, img = image_hub.recv_image()
     print("Camera IP:" +str(camera_name))
     image_hub.send_reply(b'OK')
-    while str(camera_name) not in str(camera['ip']):
+    while camera_name not in camera['ip']:
         camera_name, img = image_hub.recv_image()
         image_hub.send_reply(b'OK')
 
