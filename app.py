@@ -1,4 +1,4 @@
-from flask import Flask, render_template, make_response, request, jsonify
+from flask import Flask, render_template, make_response, request, jsonify, Response
 from pymongo import MongoClient
 import json
 from flask_graphql import GraphQLView
@@ -608,7 +608,7 @@ Login using a given username and password
 """
 @app.route('/users/login', methods=['POST'])  # TODO
 def login(*args):
-    entries = []
+    result = False
     data = request.get_json("data")
     password = data["password"]
     username = data["username"]
@@ -618,18 +618,13 @@ def login(*args):
         hashed = document["password"]
         result = bcrypt.checkpw(encode, hashed)
     if result:
-        return app.response_class(
-            status=200,
-            mimetype='application/json'
-        )
+        response = Response(status=200)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
     else:
-        return app.response_class(
-            status=401,
-            mimetype='application/json'
-        )
-    response = jsonify(entries)
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+        response = Response(status=401)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
 
 
 """
