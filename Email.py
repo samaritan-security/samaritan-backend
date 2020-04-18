@@ -1,4 +1,4 @@
-from app import get_camera_by_id, get_person_by_id
+# from app import get_camera_by_id, get_person_by_id
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -7,7 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from_email = "samaritan.sec@gmail.com"
 from_password = "sdmay2045"
 
-def send_alert_email(alert: object, receiver: str):
+def send_alert_email(alert: object, image, camera, receiver: str):
     """
 
     Parameters
@@ -23,15 +23,15 @@ def send_alert_email(alert: object, receiver: str):
 
     # Building msg body
     msg_header = MIMEText("Dear " + r_name + ",\n")
-    camera = get_camera_by_id(alert.camera_id)
+    # camera = get_camera_by_id(alert.camera_id)
     msg_body = MIMEText("There was a new alert on " + camera.nickname + " of an unknown person.\n" +
                         "The image of the unknown person was captured at " + alert.created_at +
                         " and can be seen in the email attachments.\n" +
                         "Please log into Samaritan to determine if this person should remain un-authorized.\n\n" +
                         "Sincerely,\nThe Samaritan Security Team")
 
-    img = get_person_by_id(alert.ref_id)
-    msg_image = MIMEImage(img.image)
+    # img = get_person_by_id(alert.ref_id)
+    msg_image = MIMEImage(image)
 
     msg.attach(msg_header)
     msg.attach(msg_body)
