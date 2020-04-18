@@ -7,11 +7,13 @@ graphene==2.1.8
 graphene-mongo==0.2.9
 pymongo
 requests
+bcrypt
+flask-cors
 
 cmake==3.13.3
 opencv-python==4.2.0.32
 numpy
 face-recognition
 bs4
-
+imagezmq
 imutils
