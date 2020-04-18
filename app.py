@@ -2,12 +2,13 @@ from flask import Flask, render_template, make_response, request, jsonify
 from pymongo import MongoClient
 import json
 from flask_graphql import GraphQLView
+
+from Email import send_alert_email
 from schema import schema
 import datetime
 from bson.objectid import ObjectId
 from mongoengine import connect
 import dateutil.parser
-from Alerts import send_alert_email
 import traceback
 
 app = Flask(__name__)
