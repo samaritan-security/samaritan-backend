@@ -421,18 +421,14 @@ adds new alert
 """
 
 
-@app.route('/alerts/<ref_id>/<email>', methods=['PUT'])
-def add_new_alert(ref_id: str, camera_id: str, email: str):
+@app.route('/alerts/<ref_id>', methods=['PUT'])
+def add_new_alert(ref_id: str, camera_id: str):
     time = datetime.datetime.utcnow()
     alert = {
         "ref_id": ref_id,
         "camera_id": camera_id,
         "created_at": time
     }
-    if len(email) > 0:
-        image = get_person_by_id(alert['ref_id']).image
-        camera = get_camera_by_id(alert['camera_id'])
-        send_alert_email(alert, image, camera, email)
     result = db.alerts.insert_one(alert)
     return result
 
