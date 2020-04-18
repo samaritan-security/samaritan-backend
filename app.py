@@ -22,11 +22,15 @@ initial endpoint for sample application
 all rendered templates need to be put in a templates folder
 """
 
+
 @app.route('/')
 def index():
     return render_template("index.html")
 
+
 """returns all people"""
+
+
 @app.route('/people', methods=['GET'])
 def get_all_people(*args):
     entries = []
@@ -420,7 +424,7 @@ def add_new_alert(ref_id: str, camera_id: str, email: str):
         "created_at": time
     }
     if len(email) > 0:
-        send_alert_email(0, alert, email)
+        send_alert_email(alert, email)
     result = db.alerts.insert_one(alert)
     return result
 

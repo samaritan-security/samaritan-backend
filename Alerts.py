@@ -7,7 +7,7 @@ Iowa State University
 Author(s): Kate Brune, Ryan Goluch
 '''
 
-from app import check_for_unauthorized, add_new_alert, get_camera_by_id
+from app import check_for_unauthorized, add_new_alert, get_camera_by_id, get_person_by_id
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -26,20 +26,15 @@ def alert(id: str, camera_id: str):
     add_new_alert(id, camera_id)
 
 
-def send_alert_email(image, alert: object, receiver: str):
+def send_alert_email(alert: object, receiver: str):
     """
 
     Parameters
     ----------
     receiver
-    image
     alert : object
     """
     msg = MIMEMultipart()
-
-    # TODO query camera/alert db for the camera or alert object from the given camera id
-    # todo figure out how to get the image here to attach to the email
-
     msg['Subject'] = "New Un-Authorized Alert: " + alert.ref_id
     msg['From'] = from_email
     msg['To'] = receiver
@@ -54,7 +49,9 @@ def send_alert_email(image, alert: object, receiver: str):
                         "Please log into Samaritan to determine if this person should remain un-authorized.\n\n" +
                         "Sincerely,\nThe Samaritan Security Team")
 
-    msg_image = MIMEImage(image)
+    img = get_person_by_id(alert.ref_id)
+    msg_image = MIMEImage(img.image)
+
     msg.attach(msg_header)
     msg.attach(msg_body)
     msg.attach(msg_image)
