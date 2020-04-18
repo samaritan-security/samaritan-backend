@@ -430,8 +430,8 @@ def add_new_alert(ref_id: str, camera_id: str, email: str):
         "created_at": time
     }
     if len(email) > 0:
-        image = get_person_by_id(alert.ref_id).image
-        camera = get_camera_by_id(alert.camera_id)
+        image = get_person_by_id(alert['ref_id']).image
+        camera = get_camera_by_id(alert['camera_id'])
         send_alert_email(alert, image, camera, email)
     result = db.alerts.insert_one(alert)
     return result
