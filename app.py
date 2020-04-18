@@ -7,6 +7,7 @@ import datetime
 from bson.objectid import ObjectId
 from mongoengine import connect
 import dateutil.parser
+from Alerts import send_alert_email
 import traceback
 
 app = Flask(__name__)
@@ -410,14 +411,16 @@ adds new alert
 """
 
 
-@app.route('/alerts/<ref_id>', methods=['PUT'])
-def add_new_alert(ref_id: str, camera_id: str):
+@app.route('/alerts/<ref_id>/<email>', methods=['PUT'])
+def add_new_alert(ref_id: str, camera_id: str, email: str):
     time = datetime.datetime.utcnow()
     alert = {
         "ref_id": ref_id,
         "camera_id": camera_id,
         "created_at": time
     }
+    if len(email) > 0:
+        send_alert_email(0, alert, email)
     result = db.alerts.insert_one(alert)
     return result
 
