@@ -17,3 +17,4 @@ face-recognition
 bs4
 imagezmq
 imutils
+pyopenssl

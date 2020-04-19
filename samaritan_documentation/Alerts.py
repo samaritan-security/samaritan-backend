@@ -4,7 +4,7 @@ Samaritan Security Alerts Function
 SDMay20-45
 Dept. of Electrical and Computer Engineering
 Iowa State University
-Author(s): Kate Brune, Ryan Goluch
+Author(s): Kate Brune
 '''
 
 from app import check_for_unauthorized, add_new_alert

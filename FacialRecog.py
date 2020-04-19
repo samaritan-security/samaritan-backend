@@ -13,15 +13,19 @@ import face_recognition
 import cv2
 import numpy as np
 import base64
-from datetime import datetime
-import imagezmq
-from app import add_known_person, add_unknown_person, get_all_people, get_all_cameras
-from BlurDetection import detect_blurry_image
+from app import get_all_people, get_all_cameras
 from Alerts import check_for_alert
 from app import add_unknown_person, add_new_seen
 
 
 def get_video_from_file(filename: str):
+    """ Function that allows you to read in a video feed from a file. Used for testing purposes.
+    parameter
+    ==========
+    filename: Name of the video file that you want to read in to test with
+    Returns:
+        The "camera feed" that is read in from the video file
+    """
     cap = cv2.VideoCapture(filename)
     feed = []
     while True:
@@ -29,25 +33,33 @@ def get_video_from_file(filename: str):
         if frame is None:
             break
         feed.append(frame)
-    return frame
+    return feed
 
 
 def get_camera_ip_from_file(filename: str):
+    """ Function that allows you to get all open video feeds from the camera IPs
+    that are listed in the given filename
+    Args:
+    filename:
+    :return:
+    """
     video_feed = []
     with open(filename, "r") as file:
         ip = file.readline()
-        video_feed.append(cv2.VideoCapture(
-            "http://" + str(ip).replace("\n", "") + "/video.mjpg"))
+        video_feed.append(ip)
+        # video_feed.append(cv2.VideoCapture(
+        #     "http://" + str(ip).replace("\n", "") + "/video.mjpg"))
     file.close()
     return video_feed
 
 
-'''
-Function to add a new camera to the text file of camera IPs
-'''
-
-
 def add_camera_ip(ip: str):
+    """ Function to add a new camera to the text file of camera IPs
+    Args:
+        ip: IP address of the camera that you are wanting to add to the camera.txt file
+    Returns:
+        True/False based on whether or not the IP was written to the file
+    """
     with open("camera_ip.txt", "a") as file:
         num = file.write("\n" + ip)
     file.close()
@@ -56,12 +68,13 @@ def add_camera_ip(ip: str):
     return False
 
 
-"""
-gets all encoding/id pairs from people db
-"""
-
-
 def scan_for_known_people_from_db(npy_known: str) -> dict:
+    """ Gets all encoding/id pairs from people db
+    Args:
+        npy_known: NumPy array that is passed in as a string to use in DB query
+    Returns:
+        A dictionary of any faces that were detected in the passed in string
+    """
     all_people, all_encodings = get_all_people_information()
     all_encodings = np.array(all_encodings)
     npy_array = np.array(npy_known)
@@ -184,10 +197,13 @@ from that camera
 def get_frame_from_camera(image_hub, camera):
 
     camera_name, img = image_hub.recv_image()
+    print(camera_name)
+    if str(camera_name) != str(camera):
+        image_hub.send_reply(b'Not OK')
+        return None
+
+    print("Camera IP:" +str(camera_name))
     image_hub.send_reply(b'OK')
-    while str(camera_name) not in str(camera['ip']):
-        camera_name, img = image_hub.recv_image()
-        image_hub.send_reply(b'OK')
 
     frame = cv2.resize(img, (0, 0), fx=0.75, fy=0.75)
     return frame

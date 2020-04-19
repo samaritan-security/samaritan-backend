@@ -1,4 +1,4 @@
-from flask import Flask, render_template, make_response, request, jsonify, Response
+from flask import Flask, render_template, make_response, request, jsonify
 from pymongo import MongoClient
 import json
 from flask_graphql import GraphQLView
@@ -420,28 +420,22 @@ adds new alert
 --only accessed internally--
 """
 
-def add_new_alert(ref_id: str, camera_id: str):
+
+@app.route('/alerts/<ref_id>/<email>', methods=['PUT'])
+def add_new_alert(ref_id: str, camera_id: str, email: str):
     time = datetime.datetime.utcnow()
     alert = {
         "ref_id": ref_id,
         "camera_id": camera_id,
         "created_at": time
     }
+    if len(email) > 0:
+        image = get_person_by_id(alert.ref_id).image
+        camera = get_camera_by_id(alert.camera_id)
+        send_alert_email(alert, image, camera, email)
     result = db.alerts.insert_one(alert)
     return result
 
-@app.route('/alerts/<ref_id>/<email>', methods=['GET'])
-def alert_email(ref_id: str, email: str):
-    a = db.alerts.find_one({"ref_id": ref_id})
-    print("RESULTS: "+str(a))
-    c = get_camera_by_id(a['camera_id'])
-    p = db.people.find({"ref_id": ref_id})
-    db.unauthorized
-    for i in p:
-        print("Image:" +str(i))
-        # get_person_by_id({"ref_id": ObjectId(ref_id)})
-    send_alert_email(a, p.img, c, email)
-    return True
 
 """
 returns all alerts
@@ -678,7 +672,7 @@ Login using a given username and password
 
 @app.route('/users/login', methods=['POST'])  # TODO
 def login(*args):
-    result = False
+    entries = []
     data = request.get_json("data")
     password = data["password"]
     username = data["username"]
@@ -688,13 +682,18 @@ def login(*args):
         hashed = document["password"]
         result = bcrypt.checkpw(encode, hashed)
     if result:
-        response = Response(status=200)
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
+        return app.response_class(
+            status=200,
+            mimetype='application/json'
+        )
     else:
-        response = Response(status=401)
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
+        return app.response_class(
+            status=401,
+            mimetype='application/json'
+        )
+    response = jsonify(entries)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 """
@@ -744,4 +743,4 @@ app.add_url_rule(
 )
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000, ssl_context='adhoc')
+    app.run(debug=True, host='0.0.0.0', port=5000)
