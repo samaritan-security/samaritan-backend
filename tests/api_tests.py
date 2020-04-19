@@ -5,13 +5,12 @@ import base64
 import face_recognition
 import datetime
 
-from app import app, add_new_alert, add_new_seen
+from app import app, add_new_alert, alert_email
 from FacialRecog import *
 
 
 class APITest(unittest.TestCase):
     def setUp(self):
-
         self.app = app.test_client()
         self.app.testing = True
 
@@ -118,8 +117,13 @@ class APITest(unittest.TestCase):
 
     def test_add_new_alert(self):
         result = add_new_alert("5e545bcbd541d79f9ef5b0c7",
-                               "5e795368354d37c78043626e", "rgoluch@iastate.edu")
+                               "5e795368354d37c78043626e")
         self.assertEqual(result.acknowledged, True)
+
+    def test_send_email_alert(self):
+        with app.app_context():
+            result = alert_email("5e545bcbd541d79f9ef5b0c7","rgoluch@iastate.edu")
+        self.assertEqual(result, True)
 
     def test_get_all_alerts(self):
         result = self.app.get("/alerts")

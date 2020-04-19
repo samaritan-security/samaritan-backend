@@ -420,8 +420,6 @@ adds new alert
 --only accessed internally--
 """
 
-
-@app.route('/alerts/<ref_id>', methods=['PUT'])
 def add_new_alert(ref_id: str, camera_id: str):
     time = datetime.datetime.utcnow()
     alert = {
@@ -432,6 +430,18 @@ def add_new_alert(ref_id: str, camera_id: str):
     result = db.alerts.insert_one(alert)
     return result
 
+@app.route('/alerts/<ref_id>/<email>', methods=['GET'])
+def alert_email(ref_id: str, email: str):
+    a = db.alerts.find_one({"ref_id": ref_id})
+    print("RESULTS: "+str(a))
+    c = get_camera_by_id(a['camera_id'])
+    p = db.people.find({"ref_id": ref_id})
+    db.unauthorized
+    for i in p:
+        print("Image:" +str(i))
+        # get_person_by_id({"ref_id": ObjectId(ref_id)})
+    send_alert_email(a, p.img, c, email)
+    return True
 
 """
 returns all alerts
@@ -739,4 +749,4 @@ app.add_url_rule(
 )
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000, ssl_context='adhoc')

@@ -16,7 +16,7 @@ def send_alert_email(alert: object, image, camera, receiver: str):
     alert : object
     """
     msg = MIMEMultipart()
-    msg['Subject'] = "New Un-Authorized Alert: " + alert.ref_id
+    msg['Subject'] = "No-Reply: New Un-Authorized Alert: " + alert.ref_id
     msg['From'] = from_email
     msg['To'] = receiver
     r_name = receiver.split('@')[0]
