@@ -351,8 +351,8 @@ def check_for_unauthorized(ref_id: str):
 returns all alerts instances from s_time => f_time
 for a specific camera
 """
-@app.route('/alerts/<camera_id>/<s_time>/<f_time>', methods=['GET'])
-def get_alerts_time_interval(camera_id, s_time, f_time):
+@app.route('/alerts/<s_time>/<f_time>', methods=['GET'])
+def get_alerts_time_interval(s_time, f_time):
     s_time = s_time.replace("%", " ")
     f_time = f_time.replace("%", " ")
 
@@ -361,7 +361,6 @@ def get_alerts_time_interval(camera_id, s_time, f_time):
 
     entries = []
     cursor = db.alerts.find({
-        "camera_id": camera_id,
         "created_at": {
             "$gte": start_time,
             "$lte": end_time
