@@ -28,7 +28,7 @@ def main():
             comparison_results = compare_frame_and_encodings(
                 frame, all_encodings)
             if comparison_results is not None:
-                if len(timeout_queue.get()) is not 0:
+                if len(timeout_queue.get()) != 0:
                     # print("hitting timeoutqueue")
                     if comparison_results not in timeout_queue.get():
                         timeout_queue.append(comparison_results)
