@@ -102,14 +102,14 @@ def add_known_person(*args):
     else:
         data = request.get_json("data")
     img = data["img"]
-    temp = cv2.resize(img, (0, 0), fx=0.75, fy=0.75)
-    rgb_small_frame = temp[:, :, ::-1]
-
-    # Find all the faces and face encodings in the current frame of video
-    face_locations = face_recognition.face_locations(temp[0])
-    face_encodings = face_recognition.face_encodings(
-        rgb_small_frame, face_locations)
-    npy = face_encodings
+    # temp = cv2.resize(img, (0, 0), fx=0.75, fy=0.75)
+    # rgb_small_frame = temp[:, :, ::-1]
+    #
+    # # Find all the faces and face encodings in the current frame of video
+    # face_locations = face_recognition.face_locations(temp[0])
+    # face_encodings = face_recognition.face_encodings(
+    #     rgb_small_frame, face_locations)
+    npy = data["npy"]
     name = data["name"]
     known = True
     person = {
