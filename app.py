@@ -1,3 +1,4 @@
+import face_recognition
 from flask import Flask, render_template, make_response, request, jsonify, Response
 from pymongo import MongoClient
 import json
@@ -100,7 +101,13 @@ def add_known_person(*args):
     else:
         data = request.get_json("data")
     img = data["img"]
-    npy = data["npy"]
+    rgb_small_frame = img[:, :, ::-1]
+
+    # Find all the faces and face encodings in the current frame of video
+    face_locations = face_recognition.face_locations(rgb_small_frame)
+    face_encodings = face_recognition.face_encodings(
+        rgb_small_frame, face_locations)
+    npy = face_encodings
     name = data["name"]
     known = True
     person = {
