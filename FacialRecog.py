@@ -186,9 +186,9 @@ def get_frame_from_camera(image_hub, camera):
     camera_name, img = image_hub.recv_image()
     print("Camera: "+camera_name)
     image_hub.send_reply(b'OK')
-    while str(camera_name) not in str(camera['ip']):
-        camera_name, img = image_hub.recv_image()
-        image_hub.send_reply(b'OK')
+    # while str(camera_name) not in str(camera['ip']):
+    #     camera_name, img = image_hub.recv_image()
+    #     image_hub.send_reply(b'OK')
 
     frame = cv2.resize(img, (0, 0), fx=0.75, fy=0.75)
     return frame
