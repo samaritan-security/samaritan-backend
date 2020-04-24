@@ -126,9 +126,12 @@ class APITest(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
 
     def test_add_new_camera(self):
-        data = {"ip": "192.168.1.107", "nickname": "home-camera"}
+        data = {"ip": "10.0.0.247", "nickname": "home-camera"}
+        data1 = {"ip": "10.0.0.147", "nickname": "home-camera-2"}
         result = self.app.post(
             "/camera", data=json.dumps(data), content_type="application/json")
+        result1 = self.app.post(
+            "/camera", data=json.dumps(data1), content_type="application/json")
         self.assertEqual(result.status_code, 200)
 
     def test_get_camera_by_id(self):
@@ -142,14 +145,14 @@ class APITest(unittest.TestCase):
         self.assertEquals(result.status_code, 200)
 
     def test_login(self):
-        data = {"username" : "johndoe",
+        data = {"username" : "demo",
                 "password": "passWord"}
         result = self.app.post(
             "/users/login", data=json.dumps(data), content_type="application/json")
         self.assertEqual(result.status_code, 200)
 
     def test_create_login(self):
-        data = {"username" : "johndoe",
+        data = {"username" : "demo",
                 "password": "passWord"}
         result = self.app.post(
             "/users", data=json.dumps(data), content_type="application/json")
