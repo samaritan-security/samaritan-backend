@@ -213,9 +213,8 @@ processes comparisons
 
 
 def process_comparisons(comparisons, ids, camera, frame):
-    print("Processing comparisons....")
+
     if comparisons is not None:
-        print(comparisons)
         face_recognized = [False] * len(comparisons[0])
         for comparison in comparisons:
             if True in comparison[:len(comparison)]:

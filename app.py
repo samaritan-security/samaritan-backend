@@ -177,6 +177,7 @@ for a specific camera
 """
 @app.route('/seen/<camera_id>/<s_time>/<f_time>', methods=['GET'])
 def get_seen_time_interval(camera_id: str, s_time: str, f_time: str):
+    print("Getting seen....")
     s_time = s_time.replace("%", " ")
     f_time = f_time.replace("%", " ")
 
@@ -207,6 +208,8 @@ adds new seen
 """
 @app.route('/seen/<ref_id>', methods=['PUT'])
 def add_new_seen(ref_id, camera_id):
+    print("Ref_id: " + ref_id)
+    print("Camera_id: "+ camera_id)
     time = datetime.datetime.now()
     seen = {
         "ref_id": ref_id,
