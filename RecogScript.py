@@ -23,6 +23,7 @@ def main():
     while True:
         for camera in cameras:
             frame = get_frame_from_camera(image_hub, camera)
+            print("Frame: "+frame)
             comparison_results = compare_frame_and_encodings(
                 frame, all_encodings)
             process_comparisons(comparison_results, all_ids, camera, frame)
