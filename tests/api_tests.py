@@ -75,51 +75,51 @@ class APITest(unittest.TestCase):
         result = self.app.get("/seen")
         self.assertEqual(result.status_code, 200)
 
-    def test_add_authorized(self):
-        data = {"ref_id": "5e545bcbd541d79f9ef5b0c7"}
-        result = self.app.post(
-            "/authorized", data=json.dumps(data), content_type="application/json")
-        self.assertEqual(result.status_code, 200)
-
-    def test_get_all_authorized(self):
-        result = self.app.get("/authorized")
-        self.assertEqual(result.status_code, 200)
-
-    def test_remove_from_authorized(self):
-        route = "/authorized/5e545bcbd541d79f9ef5b0c7"
-        result = self.app.delete(route)
-        self.assertEqual(result.status_code, 200)
-
-    def test_add_unauthorized(self):
-        data = {"ref_id": "5e545bcbd541d79f9ef5b0c7"}
-        result = self.app.post(
-            "/unauthorized", data=json.dumps(data), content_type="application/json")
-        self.assertEqual(result.status_code, 200)
-
-    def test_get_all_unauthorized(self):
-        result = self.app.get("/unauthorized")
-        self.assertEqual(result.status_code, 200)
-
-    def test_check_for_unauthorized(self):
-        route = "/unauthorized/5e545bcbd541d79f9ef5b0c7"
-        result = self.app.get(route)
-        self.assertEqual(result.status_code, 200)
-
-    def test_remove_from_unauthorized(self):
-        route = "/unauthorized/5e545bcbd541d79f9ef5b0c7"
-        result = self.app.delete(route)
-        self.assertEqual(result.status_code, 200)
-
-    def test_get_alerts_time_intervale(self):
-        route = "/alerts/" + str(datetime.datetime.now()) + \
-            "/" + str(datetime.datetime.now())
-        result = self.app.get(route)
-        self.assertEqual(result.status_code, 200)
-
-    def test_add_new_alert(self):
-        result = add_new_alert("5e545bcbd541d79f9ef5b0c7",
-                               "5e795368354d37c78043626e")
-        self.assertEqual(result.acknowledged, True)
+    # def test_add_authorized(self):
+    #     data = {"ref_id": "5e545bcbd541d79f9ef5b0c7"}
+    #     result = self.app.post(
+    #         "/authorized", data=json.dumps(data), content_type="application/json")
+    #     self.assertEqual(result.status_code, 200)
+    #
+    # def test_get_all_authorized(self):
+    #     result = self.app.get("/authorized")
+    #     self.assertEqual(result.status_code, 200)
+    #
+    # def test_remove_from_authorized(self):
+    #     route = "/authorized/5e545bcbd541d79f9ef5b0c7"
+    #     result = self.app.delete(route)
+    #     self.assertEqual(result.status_code, 200)
+    #
+    # def test_add_unauthorized(self):
+    #     data = {"ref_id": "5e545bcbd541d79f9ef5b0c7"}
+    #     result = self.app.post(
+    #         "/unauthorized", data=json.dumps(data), content_type="application/json")
+    #     self.assertEqual(result.status_code, 200)
+    #
+    # def test_get_all_unauthorized(self):
+    #     result = self.app.get("/unauthorized")
+    #     self.assertEqual(result.status_code, 200)
+    #
+    # def test_check_for_unauthorized(self):
+    #     route = "/unauthorized/5e545bcbd541d79f9ef5b0c7"
+    #     result = self.app.get(route)
+    #     self.assertEqual(result.status_code, 200)
+    #
+    # def test_remove_from_unauthorized(self):
+    #     route = "/unauthorized/5e545bcbd541d79f9ef5b0c7"
+    #     result = self.app.delete(route)
+    #     self.assertEqual(result.status_code, 200)
+    #
+    # def test_get_alerts_time_intervale(self):
+    #     route = "/alerts/" + str(datetime.datetime.now()) + \
+    #         "/" + str(datetime.datetime.now())
+    #     result = self.app.get(route)
+    #     self.assertEqual(result.status_code, 200)
+    #
+    # def test_add_new_alert(self):
+    #     result = add_new_alert("5e545bcbd541d79f9ef5b0c7",
+    #                            "5e795368354d37c78043626e")
+    #     self.assertEqual(result.acknowledged, True)
 
     def test_get_all_alerts(self):
         result = self.app.get("/alerts")
